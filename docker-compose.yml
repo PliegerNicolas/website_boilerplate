@@ -1,0 +1,78 @@
+services:
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    build:
+      context: ./srcs/nginx
+      args:
+        - DOMAIN_NAME=${DOMAIN_NAME}
+        - FRONTEND_PORT=${FRONTEND_PORT}
+        - BACKEND_PORT=${BACKEND_PORT}
+    restart: unless-stopped
+    networks:
+      - network
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - vuejs
+
+  vuejs:
+    container_name: vuejs
+    image: vuejs
+    build:
+      context: ./srcs/vuejs
+      args:
+        - PORT=${FRONTEND_PORT}
+    restart: unless-stopped
+    networks:
+      - network
+    depends_on:
+      - nestjs
+
+  nestjs:
+    container_name: nestjs
+    image: nestjs
+    build:
+      context: ./srcs/nestjs
+      args:
+      - PORT=${BACKEND_PORT}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - network
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    build:
+      context: ./srcs/postgres
+      args:
+        - PORT=${DB_PORT}
+        - POSTGRES_DB=${POSTGRES_DB}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - network
+#    volumes:
+#      - postgresql_data:/var/lib/postgresql/data
+
+networks:
+  network:
+    name: network
+    driver: bridge
+
+volumes:
+  postgresql_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/data/postgresql
+      o: bind
