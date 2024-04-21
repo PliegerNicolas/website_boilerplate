@@ -5,11 +5,20 @@ import * as Joi from "joi";
 // variables.
 const configVariables: ConfigFactory = async () => {
     return ({
+        global: {
+            domain_name: process.env.DOMAIN_NAME,
+        },
+        frontend: {
+            host: 'vuejs',
+            port: parseInt(process.env.FRONTEND_PORT ?? '3000'),
+        },
+        backend: {
+            host: 'nestjs',
+            port: parseInt(process.env.PORT ?? '3000'),
+        },
         database: {
             host: 'postgres',
-            port: +(process.env.DB_PORT || 5432)
-        },
-        postgres: {
+            port: parseInt(process.env.DB_PORT ?? '5432'),
             db: process.env.POSTGRES_DB,
             user: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
@@ -25,12 +34,21 @@ const configVariables: ConfigFactory = async () => {
 
 // Use Joi to validate presence of
 // environment variables and type.
-const validationSchema = Joi.object({
-    database: Joi.object({
+const ValidationSchema = Joi.object({
+    global: Joi.object({
+        domain_name: Joi.string().required(),
+    }),
+    frontend: Joi.object({
         host: Joi.string().required(),
         port: Joi.number().required(),
     }),
-    postgres: Joi.object({
+    backendend: Joi.object({
+        host: Joi.string().required(),
+        port: Joi.number().required(),
+    }),
+    database: Joi.object({
+        host: Joi.string().required(),
+        port: Joi.number().required(),
         name: Joi.string().required(),
         user: Joi.string().required(),
         password: Joi.string().required(),
@@ -50,9 +68,7 @@ export const ConfigOptions: ConfigModuleOptions = {
     cache: true,
     ignoreEnvVars: false,
     expandVariables: true,
-    validationOptions: {
-        abortEarly: true,
-    },
-    validationSchema: validationSchema,
+    validationOptions: { abortEarly: true },
+    validationSchema: ValidationSchema,
     load: [configVariables],
 };

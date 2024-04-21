@@ -36,7 +36,7 @@ RUN addgroup -S vuejs && \
 # Set USER
 USER vuejs
 
-# Expose Vue default port
+# Expose port
 EXPOSE ${PORT}
 
 CMD ["pnpm", "run", "dev"]

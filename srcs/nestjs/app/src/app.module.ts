@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ConfigOptions } from './config/options.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfigService } from './config/typeorm-config/typeorm-config.service';
+import { CorsConfigService } from './config/cors-config/cors-config.service';
 
 @Module({
 	imports: [
@@ -15,6 +16,6 @@ import { TypeormConfigService } from './config/typeorm-config/typeorm-config.ser
 		}),
 	],
 	controllers: [AppController],
-	providers: [AppService, TypeormConfigService],
+	providers: [AppService, TypeormConfigService, CorsConfigService],
 })
 export class AppModule {}

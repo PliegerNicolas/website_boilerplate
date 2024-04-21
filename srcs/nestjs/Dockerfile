@@ -2,13 +2,17 @@
 FROM alpine:3.19.1
 
 ARG APP_DIR='/app' \
+    DOMAIN_NAME \
     PORT \
+    FRONTEND_PORT \
     DB_PORT \
     POSTGRES_DB \
     POSTGRES_USER \
     POSTGRES_PASSWORD
 
-ENV PORT=${PORT} \
+ENV DOMAIN_NAME=${DOMAIN_NAME} \
+    PORT=${PORT} \
+    FRONTEND_PORT=${FRONTEND_PORT} \
     DB_PORT=${DB_PORT} \
     POSTGRES_DB=${POSTGRES_DB} \
     POSTGRES_USER=${POSTGRES_USER} \
@@ -27,6 +31,15 @@ RUN apk update && \
 # Create and Set the working directory in the container
 WORKDIR ${APP_DIR}
 
+# Create non-root USER to run the application
+RUN addgroup -S nestjs && \
+    adduser -S nestjs -G nestjs && \
+    chown -R nestjs:nestjs ${APP_DIR} && \
+	chmod 700 ${APP_DIR}
+
+# Set USER
+USER nestjs
+
 # Copy package files, and install dependencies using pnpm
 COPY ./app/package*.json ./app/pnpm-lock.yaml ./
 RUN pnpm install
@@ -36,15 +49,6 @@ COPY ./app/ .
 
 # Build the application (assumes there's a build script defined in package.json)
 RUN pnpm run build
-
-# Create non-root USER to run the application
-RUN addgroup -S nestjs && \
-    adduser -S nestjs -G nestjs && \
-    chown -R nestjs:nestjs ${APP_DIR} && \
-	chmod 700 ${APP_DIR}
-
-# Set USER
-USER nestjs
 
 # Expose NestJs port
 EXPOSE ${PORT}
