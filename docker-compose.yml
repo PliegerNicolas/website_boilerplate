@@ -40,10 +40,12 @@ services:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - PORT=${BACKEND_PORT}
       - FRONTEND_PORT=${FRONTEND_PORT}
+      - REDIS_PORT=${REDIS_PORT}
       - DB_PORT=${DB_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     restart: unless-stopped
     networks:
       - network
@@ -74,6 +76,8 @@ services:
       context: ./srcs/redis
       args:
         - PORT=${REDIS_PORT}
+        - REDIS_USER=${REDIS_USER}
+        - REDIS_PASSWORD=${REDIS_PASSWORD}
     restart: unless-stopped
     networks:
       - network

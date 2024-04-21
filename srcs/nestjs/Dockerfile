@@ -5,6 +5,7 @@ ARG APP_DIR='/app' \
     DOMAIN_NAME \
     PORT \
     FRONTEND_PORT \
+    REDIS_PORT \
     DB_PORT \
     POSTGRES_DB \
     POSTGRES_USER \
@@ -13,6 +14,7 @@ ARG APP_DIR='/app' \
 ENV DOMAIN_NAME=${DOMAIN_NAME} \
     PORT=${PORT} \
     FRONTEND_PORT=${FRONTEND_PORT} \
+    REDIS_PORT=${REDIS_PORT} \
     DB_PORT=${DB_PORT} \
     POSTGRES_DB=${POSTGRES_DB} \
     POSTGRES_USER=${POSTGRES_USER} \
@@ -21,7 +23,7 @@ ENV DOMAIN_NAME=${DOMAIN_NAME} \
 # Install dependencies
 RUN apk update && \
     apk add --no-cache --virtual .build-deps \
-        nodejs \
+        nodejs redis \
         npm \
         gcc make libc-dev linux-headers \
         python3 && \

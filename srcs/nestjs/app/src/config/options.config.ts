@@ -23,6 +23,12 @@ const configVariables: ConfigFactory = async () => {
             user: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
         },
+        redis: {
+            host: 'redis',
+            port: parseInt(process.env.REDIS_PORT ?? '6379'),
+            username: process.env.REDIS_USERNAME,
+            password: process.env.REDIS_PASSWORD,
+        },
         jwt: {
             jwtSecret: process.env.JWT_SECRET,
             jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
@@ -42,7 +48,7 @@ const ValidationSchema = Joi.object({
         host: Joi.string().required(),
         port: Joi.number().required(),
     }),
-    backendend: Joi.object({
+    backend: Joi.object({
         host: Joi.string().required(),
         port: Joi.number().required(),
     }),
@@ -51,6 +57,12 @@ const ValidationSchema = Joi.object({
         port: Joi.number().required(),
         name: Joi.string().required(),
         user: Joi.string().required(),
+        password: Joi.string().required(),
+    }),
+    redis: Joi.object({
+        host: Joi.string().required(),
+        port: Joi.number().required(),
+        username: Joi.string().required(),
         password: Joi.string().required(),
     }),
     jwt: Joi.object({
