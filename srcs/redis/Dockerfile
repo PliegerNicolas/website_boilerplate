@@ -1,15 +1,14 @@
 # Latest stable version of alpine linux image as of 15/04/2024
 FROM alpine:3.19.1
 
-ARG REDIS_PATH='/etc/redis' \
-    REDIS_SCRIPTS='/etc/redis/scripts' \
-    PORT \
+# Set docker-compose build arguments
+ARG PORT \
     REDIS_USER \
     REDIS_PASSWORD
 
-ENV PORT=${PORT} \
-    REDIS_USERNAME=${REDIS_USERNAME} \
-    REDIS_PASSWORD=${REDIS_PASSWORD}
+# Set local build arguments
+ARG REDIS_PATH='/etc/redis' \
+    REDIS_SCRIPTS='/etc/redis/scripts'
 
 # Install dependencies
 RUN apk update && \

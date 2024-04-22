@@ -12,7 +12,7 @@ async function bootstrap() {
 
 	app.setGlobalPrefix('api');
 	app.enableCors(app.get(CorsConfigService).getCorsOptions());	// Should get tested
-	app.use(helmet(HelmetConfig));	// Should get tested
+	app.use(helmet(HelmetConfig));									// Should get tested
 
 	configureSwagger(app);
 

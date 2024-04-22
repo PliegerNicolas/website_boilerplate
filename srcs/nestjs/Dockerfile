@@ -1,24 +1,23 @@
 # Latest stable version of alpine linux image as of 15/04/2024
 FROM alpine:3.19.1
 
-ARG APP_DIR='/app' \
+# ARGS APP_DIR PORT
+
+# Set docker-compose build arguments
+ARG NODE_ENV \
     DOMAIN_NAME \
     PORT \
     FRONTEND_PORT \
     REDIS_PORT \
+    REDIS_USER \
+    REDIS_PASSWORD \
     DB_PORT \
     POSTGRES_DB \
     POSTGRES_USER \
     POSTGRES_PASSWORD
 
-ENV DOMAIN_NAME=${DOMAIN_NAME} \
-    PORT=${PORT} \
-    FRONTEND_PORT=${FRONTEND_PORT} \
-    REDIS_PORT=${REDIS_PORT} \
-    DB_PORT=${DB_PORT} \
-    POSTGRES_DB=${POSTGRES_DB} \
-    POSTGRES_USER=${POSTGRES_USER} \
-    POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+# Set local build arguments
+ARG APP_DIR='/app'
 
 # Install dependencies
 RUN apk update && \

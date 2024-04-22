@@ -1,19 +1,19 @@
 # Latest stable version of alpine linux image as of 15/04/2024
 FROM alpine:3.19.1
 
-ARG	PGDATA='/var/lib/postgresql/data' \
-	PGRUN='/run/postgresql' \
-	PGSCRIPTS='/var/lib/postgresql/scripts' \
-	PORT \
+# Set docker-compose build arguments
+ARG PORT \
 	POSTGRES_DB \
 	POSTGRES_USER \
 	POSTGRES_PASSWORD
 
-ENV	PGDATA=${PGDATA} \
-	PORT=${PORT} \
-	POSTGRES_DB=${POSTGRES_DB} \
-	POSTGRES_USER=${POSTGRES_USER} \
-	POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+# Set local build arguments
+ARG	PGDATA='/var/lib/postgresql/data' \
+	PGRUN='/run/postgresql' \
+	PGSCRIPTS='/var/lib/postgresql/scripts'
+
+# Add PGDATA to env variables independently of docker-compose
+ENV PGDATA=${PGDATA}
 
 # Install dependencies
 RUN apk update && \

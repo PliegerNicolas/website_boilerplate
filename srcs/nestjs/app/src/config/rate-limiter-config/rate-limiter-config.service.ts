@@ -1,21 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Redis, RedisOptions } from 'ioredis';
 import { RateLimiterOptions } from 'nestjs-rate-limiter';
-import Redis, { RedisOptions } from 'ioredis';
 
 @Injectable()
 export class RateLimiterConfigService {
 
     private readonly redisClient: Redis;
+    private readonly logger = new Logger(RateLimiterConfigService.name);
 
-    constructor(private readonly configService: ConfigService) {}
+    constructor(private readonly configService: ConfigService) {
+        const redisOptions: RedisOptions = {
+            host: this.configService.get<string>('redis.host', 'localhost'),
+            port: this.configService.get<number>('redis.port', 6379),
+            //username: this.configService.get<string>('redis.user', 'default'),
+            username: 'user_test',
+            password: this.configService.get<string>('redis.password', 'default'),
+        };
+
+        try {
+            this.redisClient = new Redis(redisOptions);
+        } catch(error) {
+            this.logger.error(`Failed to connect to Redis: ${error.message}`);
+            throw error;
+        }
+    }
 
     createRateLimiterOptions(): RateLimiterOptions {
         return ({
             for: 'Express',
-            type: 'Memory',
-            keyPrefix: 'global',
-            points: 4,
+            type: 'Redis',
+            keyPrefix: '',
+            points: 2,
             pointsConsumed: 1,
             inmemoryBlockOnConsumed: 0,
             duration: 1,
@@ -24,13 +40,7 @@ export class RateLimiterConfigService {
             queueEnabled: false,
             whiteList: [],
             blackList: [],
-            storeClient: undefined,
-            insuranceLimiter: undefined,
-            storeType: undefined,
-            dbName: undefined,
-            tableName: undefined,
-            tableCreated: undefined,
-            clearExpiredByTimeout: undefined,
+            storeClient: this.redisClient,
             execEvenly: false,
             execEvenlyMinDelayMs: undefined,
             indexKeyPrefix: {},

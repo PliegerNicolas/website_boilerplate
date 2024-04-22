@@ -1,15 +1,14 @@
 # Latest stable version of alpine linux image as of 15/04/2024
 FROM alpine:3.19.1
 
-ARG NGINX_VERSION='1.24.0' \
-    NGINX_SCRIPTS='/var/nginx/scripts' \
-    DOMAIN_NAME \
+# Set docker-compose build arguments
+ARG DOMAIN_NAME \
     FRONTEND_PORT \
     BACKEND_PORT
 
-ENV DOMAIN_NAME=${DOMAIN_NAME} \
-    FRONTEND_PORT=${FRONTEND_PORT} \
-    BACKEND_PORT=${BACKEND_PORT}
+# Set local build arguments
+ARG NGINX_VERSION='1.24.0' \
+    NGINX_SCRIPTS='/var/nginx/scripts'
 
 # Install dependencies
 RUN apk update && \

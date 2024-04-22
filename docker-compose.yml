@@ -9,6 +9,10 @@ services:
         - DOMAIN_NAME=${DOMAIN_NAME}
         - FRONTEND_PORT=${FRONTEND_PORT}
         - BACKEND_PORT=${BACKEND_PORT}
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+      - BACKEND_PORT=${BACKEND_PORT}
     restart: unless-stopped
     networks:
       - network
@@ -25,6 +29,9 @@ services:
       context: ./srcs/vuejs
       args:
         - PORT=${FRONTEND_PORT}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${FRONTEND_PORT}
     restart: unless-stopped
     networks:
       - network
@@ -37,15 +44,29 @@ services:
     build:
       context: ./srcs/nestjs
       args:
+      - NODE_ENV=${NODE_ENV}
       - DOMAIN_NAME=${DOMAIN_NAME}
       - PORT=${BACKEND_PORT}
       - FRONTEND_PORT=${FRONTEND_PORT}
       - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - DB_PORT=${DB_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - PORT=${BACKEND_PORT}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USER=${REDIS_USER}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: unless-stopped
     networks:
       - network
@@ -63,6 +84,11 @@ services:
         - POSTGRES_DB=${POSTGRES_DB}
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    environment:
+      - PORT=${DB_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: unless-stopped
     networks:
       - network
@@ -78,6 +104,10 @@ services:
         - PORT=${REDIS_PORT}
         - REDIS_USER=${REDIS_USER}
         - REDIS_PASSWORD=${REDIS_PASSWORD}
+    environment:
+      - PORT=${REDIS_PORT}
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     restart: unless-stopped
     networks:
       - network
