@@ -44,12 +44,12 @@ RUN sh ${PGSCRIPTS}/generate_postgresql.conf.sh && rm -rf ${PGSCRIPTS}
 
 # Setup $POSTGRES_DB
 RUN pg_ctl -w start && \
-		if [ -z "$( psql -p $PORT -XtAc "SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" )" ]; then \
-			psql -p $PORT -c "CREATE DATABASE $POSTGRES_DB"; \
-		fi && \
 		if [ -z "$(psql -p $PORT -XtAc "SELECT 1 FROM pg_user WHERE usename!='postgres'" )" ]; then \
 			psql -p $PORT -c "CREATE USER $POSTGRES_USER WITH ENCRYPTED PASSWORD '$POSTGRES_PASSWORD';"; \
-			psql -p $PORT -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO $POSTGRES_USER;"; \
+			if [ -z "$( psql -p $PORT -XtAc "SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" )" ]; then \
+				psql -p $PORT -c "CREATE DATABASE $POSTGRES_DB WITH OWNER $POSTGRES_USER"; \
+				psql -p $PORT -d $POSTGRES_DB -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"; \
+			fi; \
 		fi && \
     pg_ctl -w stop -m fast
 
