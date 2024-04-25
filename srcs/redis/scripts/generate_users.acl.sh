@@ -12,7 +12,7 @@ for env_var_name in $REQUIRED_ENV_VARS; do
     env_var_value=$(printenv $env_var_name)
 
     if [ -z "$env_var_value" ]; then
-	    NOT_SET_ENV_VARS="${NOT_SET_ENV_VARS}${env_var_name}";
+	    NOT_SET_ENV_VARS="${NOT_SET_ENV_VARS} ${env_var_name}";
     else
         SED="-e 's/\${${env_var_name}}/${env_var_value}/g'"
         if [ -z "$JOINED_SEDS" ]; then
@@ -25,7 +25,7 @@ done
 echo "[i] > $JOINED_SEDS";
 
 if [ -n "$NOT_SET_ENV_VARS" ]; then
-    echo "[w] Missing environment variables: $NOT_SET_ENV_VARS"
+    echo "[w] Missing environment variables:$NOT_SET_ENV_VARS"
     exit 1;
 fi
 

@@ -1,9 +1,9 @@
 #! /bin/sh
 
-INPUT_FILE="/var/lib/postgresql/data/postgresql.conf.template";
-OUTPUT_FILE="/var/lib/postgresql/data/postgresql.conf";
+INPUT_FILE="/var/lib/postgresql/data/pg_hba.conf.template";
+OUTPUT_FILE="/var/lib/postgresql/data/pg_hba.conf";
 
-REQUIRED_ENV_VARS="PORT";
+REQUIRED_ENV_VARS="WHITELISTED_CONTAINER_NAME";
 NOT_SET_ENV_VARS="";
 
 echo "[i] Generating environment variable substitution command (with sed):"

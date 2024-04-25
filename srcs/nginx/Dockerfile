@@ -13,7 +13,6 @@ ARG NGINX_VERSION='1.24.0' \
 # Install dependencies
 RUN apk update && \
     apk add --no-cache --virtual .build-deps \
-        wget \
         gcc make libc-dev linux-headers \
         pcre-dev \
         zlib-dev \

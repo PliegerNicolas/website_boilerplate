@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
 
-export class DatabaseConfigEnvValidation {
+export class DatabaseConfig {
 
     @IsNotEmpty()
     @IsString()
@@ -21,5 +22,13 @@ export class DatabaseConfigEnvValidation {
     @IsNotEmpty()
     @IsString()
     password: string;
+
+}
+
+export class DatabasesConfigEnvValidation {
+
+    @ValidateNested()
+    @Type(() => DatabaseConfig)
+    for_nestjs: DatabaseConfig;
 
 }

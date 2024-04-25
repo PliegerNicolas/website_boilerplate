@@ -2,7 +2,8 @@
 FROM alpine:3.19.1
 
 # Set docker-compose build arguments
-ARG PORT \
+ARG WHITELISTED_CONTAINER_NAME \
+	PORT \
 	POSTGRES_DB \
 	POSTGRES_USER \
 	POSTGRES_PASSWORD
@@ -10,7 +11,8 @@ ARG PORT \
 # Set local build arguments
 ARG	PGDATA='/var/lib/postgresql/data' \
 	PGRUN='/run/postgresql' \
-	PGSCRIPTS='/var/lib/postgresql/scripts'
+	PGSCRIPTS='/var/lib/postgresql/scripts' \
+	WHITELISTED_CONTAINER_NAME=${WHITELISTED_CONTAINER_NAME}
 
 # Add PGDATA to env variables independently of docker-compose
 ENV PGDATA=${PGDATA}
@@ -36,11 +38,13 @@ RUN if [ -z "$(ls -A $PGDATA)" ]; then \
 	fi
 
 # Transfer local configuration files to container
-COPY ./conf/pg_hba.conf ./conf/postgresql.conf.template ${PGDATA}/
-COPY ./scripts/generate_postgresql.conf.sh ${PGSCRIPTS}/
+COPY ./conf/pg_hba.conf.template ./conf/postgresql.conf.template ${PGDATA}/
+COPY ./scripts/generate_postgresql.conf.sh ./scripts/generate_pg_hba.conf.sh ${PGSCRIPTS}/
 
-# Execute script to generate postgresql.conf
-RUN sh ${PGSCRIPTS}/generate_postgresql.conf.sh && rm -rf ${PGSCRIPTS}
+# Execute script to generate postgresql.conf and pg_hba.conf files
+RUN sh ${PGSCRIPTS}/generate_postgresql.conf.sh && \
+	sh ${PGSCRIPTS}/generate_pg_hba.conf.sh && \
+	rm -rf ${PGSCRIPTS}
 
 # Setup $POSTGRES_DB
 RUN pg_ctl -w start && \
