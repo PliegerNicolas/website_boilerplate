@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsNotEmpty, IsString, ValidateIf } from "class-validator";
 import { RegistrationMethod } from "../enums/registration-method.enum";
 import { RequiredIf } from "src/utils/validators/required-if/required-if.decorator";
+import { BeforeInsert, BeforeUpdate } from "typeorm";
 
 export class CreateUserDto {
 
@@ -22,7 +23,10 @@ export class CreateUserDto {
     readonly registrationMethod: RegistrationMethod;
 
     @ApiProperty()
-    @RequiredIf({ key: 'registrationMethod', expectedValue: RegistrationMethod.LOCAL })
+    @RequiredIf({
+        key: 'registrationMethod',
+        expectedValue: RegistrationMethod.LOCAL
+    })
     readonly password?: string;
 
 }

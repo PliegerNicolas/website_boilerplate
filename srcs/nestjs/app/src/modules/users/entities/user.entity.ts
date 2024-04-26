@@ -1,6 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn, TableInheritance } from "typeorm";
 import { RegistrationMethod } from "../models/enums/registration-method.enum";
 import { IsEnum } from "class-validator";
+import { Exclude } from "class-transformer";
 
 @Entity({ name: 'users' })
 @TableInheritance({ column: { name: 'authProvider', type: "varchar" } })
@@ -10,6 +11,7 @@ export class User {
     uuid: string;
 
     @Column({ unique: true })
+    @Exclude()
     email: string;
 
     @Column({ unique: true })
@@ -20,6 +22,7 @@ export class User {
     registrationMethod: RegistrationMethod;
 
     @Column({ nullable: true })
+    @Exclude()
     password: string;
 
 

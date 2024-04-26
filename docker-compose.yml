@@ -93,8 +93,8 @@ services:
     restart: unless-stopped
     networks:
       - network
-    volumes:
-      - postgres_nestjs_data:/var/lib/postgresql/data
+    #volumes:
+    #  - postgres_nestjs_data:/var/lib/postgresql/data
 
   redis:
     container_name: redis
@@ -112,8 +112,8 @@ services:
     restart: unless-stopped
     networks:
       - network
-    volumes:
-      - redis_data:/var/lib/redis
+    #volumes:
+    #  - redis_data:/var/lib/redis
 
 networks:
   network:
