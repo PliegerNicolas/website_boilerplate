@@ -31,7 +31,7 @@ export class RateLimiterConfigService {
             for: 'Express',
             type: 'Redis',
             keyPrefix: '',
-            points: 2,
+            points: 4,
             pointsConsumed: 1,
             inmemoryBlockOnConsumed: 0,
             duration: 1,

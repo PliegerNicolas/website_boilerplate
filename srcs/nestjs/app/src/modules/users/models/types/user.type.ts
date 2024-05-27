@@ -1,22 +1,22 @@
 import { RegistrationMethod } from "../enums/registration-method.enum";
 
 export type CreateUserParams = {
-    email: string;
-    displayName: string;
-    registrationMethod: RegistrationMethod,
-    password: string;
+    readonly email: string;
+    readonly displayName: string;
+    readonly registrationMethod: RegistrationMethod,
+    readonly password: string | undefined;
 }
 
 export type ReplaceUserParams = {
-    email: string;
-    displayName: string;
-    registrationMethod: RegistrationMethod,
-    password?: string;
+    readonly email: string;
+    readonly displayName: string;
+    readonly registrationMethod: RegistrationMethod,
+    readonly password: string | undefined;
 }
 
 export type UpdateUserParams = {
-    email?: string;
-    displayName?: string;
-    registrationMethod?: RegistrationMethod,
-    password?: string;
+    readonly email?: string;
+    readonly displayName?: string;
+    readonly registrationMethod?: RegistrationMethod,
+    readonly password?: string | undefined;
 }

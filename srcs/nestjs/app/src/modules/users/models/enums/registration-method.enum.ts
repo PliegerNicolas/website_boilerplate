@@ -1,4 +1,4 @@
 export enum RegistrationMethod {
     LOCAL = 'local',
-    GOOGLE = 'google',
+    OAUTH2_GOOGLE = 'oauth2_google',
 }

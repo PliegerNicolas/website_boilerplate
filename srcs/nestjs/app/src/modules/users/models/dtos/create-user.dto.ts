@@ -1,32 +1,31 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEnum, IsNotEmpty, IsString, ValidateIf } from "class-validator";
+import { IsDefined, IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { RegistrationMethod } from "../enums/registration-method.enum";
 import { RequiredIf } from "src/utils/validators/required-if/required-if.decorator";
-import { BeforeInsert, BeforeUpdate } from "typeorm";
 
 export class CreateUserDto {
 
-    @ApiProperty()
+    @ApiProperty({ description: 'Email of the user.' })
     @IsNotEmpty()
     @IsString()
     @IsEmail()
     readonly email: string;
 
-    @ApiProperty()
+    @ApiProperty({ description: 'Display name of the user. In other words it\s username.' })
     @IsNotEmpty()
     @IsString()
     readonly displayName: string;
 
-    @ApiProperty()
+    @ApiProperty({ description: 'Through wich method they registered (Local, Oauth2_google, ...).' })
     @IsNotEmpty()
     @IsEnum(RegistrationMethod)
     readonly registrationMethod: RegistrationMethod;
 
-    @ApiProperty()
+    @ApiProperty({ description: 'Password. It\'s presence is only necessary with local registration method.' })
     @RequiredIf({
         key: 'registrationMethod',
         expectedValue: RegistrationMethod.LOCAL
     })
-    readonly password?: string;
+    readonly password: string | undefined;
 
 }

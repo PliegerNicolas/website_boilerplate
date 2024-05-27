@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn, TableInheritance } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, TableInheritance, UpdateDateColumn } from "typeorm";
 import { RegistrationMethod } from "../models/enums/registration-method.enum";
 import { IsEnum } from "class-validator";
 import { Exclude } from "class-transformer";
@@ -11,7 +11,7 @@ export class User {
     uuid: string;
 
     @Column({ unique: true })
-    @Exclude()
+    //@Exclude()
     email: string;
 
     @Column({ unique: true })
@@ -25,7 +25,15 @@ export class User {
     @Exclude()
     password: string;
 
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
 
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
+
+    /* Relationships */
+
+    /* Life cycle */
 
     @BeforeInsert()
     @BeforeUpdate()
@@ -38,5 +46,7 @@ export class User {
     private shouldPasswordExist(): boolean {
         return (this.registrationMethod === RegistrationMethod.LOCAL);
     }
+
+    /* Helper methods */
 
 }
