@@ -2,13 +2,14 @@ import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGe
 import { RegistrationMethod } from "../models/enums/registration-method.enum";
 import { IsEnum } from "class-validator";
 import { Exclude } from "class-transformer";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity({ name: 'users' })
 @TableInheritance({ column: { name: 'authProvider', type: "varchar" } })
 export class User {
 
     @PrimaryGeneratedColumn('uuid')
-    uuid: string;
+    uuid: string = uuidv4();
 
     @Column({ unique: true })
     //@Exclude()

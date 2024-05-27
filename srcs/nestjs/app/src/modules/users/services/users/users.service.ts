@@ -67,7 +67,7 @@ export class UsersService {
 
     /* Other functions */
 
-    async findUserByUuid(uuid: string): Promise<User | null> {
+    async findUserById(uuid: string): Promise<User | null> {
         const user: User | null = await this.userRepository.findOne({
             where: {
                 uuid: Equal(uuid),

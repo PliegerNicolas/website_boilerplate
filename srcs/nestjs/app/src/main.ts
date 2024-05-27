@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { HelmetConfig } from './config/helmet-config/helmet.config';
 import { CorsConfigService } from './config/cors-config/cors-config.service';
 import { ValidationPipe } from '@nestjs/common';
+import { TypeORMExceptionFilter } from './utils/filters/typeorm/typeorm.filter';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -16,6 +17,7 @@ async function bootstrap() {
 	// Implement CSRF protection
 
 	app.setGlobalPrefix('api');
+	app.useGlobalFilters(new TypeORMExceptionFilter());
 	app.useGlobalPipes(new ValidationPipe({
 		whitelist: true,
 		transform: true,
