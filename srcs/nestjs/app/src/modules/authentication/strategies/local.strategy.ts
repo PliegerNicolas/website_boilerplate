@@ -5,7 +5,7 @@ import { AuthenticationService } from "../services/authentication/authentication
 import { TokenPayloadParams } from "../models/types/token-payload.type";
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+export class LocalStrategy extends PassportStrategy(Strategy) {
 
     constructor(
         private readonly authenticationService: AuthenticationService,
@@ -18,7 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
     async validate(displayName: string, password: string) {
         const tokenPayload: TokenPayloadParams | null = await this.authenticationService.validateLocalUser(displayName, password);
-    
+
         if (!tokenPayload) throw new UnauthorizedException('User unauthorized.');
 
         return (tokenPayload);
