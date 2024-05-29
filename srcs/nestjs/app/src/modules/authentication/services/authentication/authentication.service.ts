@@ -32,8 +32,6 @@ export class AuthenticationService {
             username: user.username,
         };
 
-        // Generate and set jwt tokens ???
-
         return (userPayload);
     }
 
