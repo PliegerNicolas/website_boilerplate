@@ -6,10 +6,6 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { HashingModule } from 'src/utils/hashing/hashing.module';
 import { ConfigModule } from '@nestjs/config';
-import { LocalStrategy } from './strategies/local.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
-import { JwtTokenStrategy } from './strategies/jwt-token.strategy';
-import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
 
 @Module({
     imports: [
@@ -28,10 +24,6 @@ import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy
     controllers: [AuthenticationController],
     providers: [
         AuthenticationService,
-        JwtTokenStrategy,
-        JwtRefreshTokenStrategy,
-        LocalStrategy,
-        GoogleStrategy,
     ],
     exports: [],
 })

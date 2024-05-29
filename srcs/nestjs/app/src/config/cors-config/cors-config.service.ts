@@ -17,11 +17,11 @@ export class CorsConfigService {
     }
 
     getAllowedOrigins(): string[] {
-        const domain_name: string = this.configService.get<string>('global.domain_name', 'localhost');
-        const frontend_host: string = this.configService.get<string>('frontend.host', 'localhost');
-        const frontend_port: string = this.configService.get<string>('frontend.port', '8080');
-        const backend_host: string = this.configService.get<string>('backend.host', 'localhost');
-        const backend_port: string = this.configService.get<string>('backend.port', '3000');
+        const domain_name: string = this.configService.getOrThrow<string>('global.domain_name');
+        const frontend_host: string = this.configService.getOrThrow<string>('frontend.host');
+        const frontend_port: string = this.configService.getOrThrow<string>('frontend.port');
+        const backend_host: string = this.configService.getOrThrow<string>('backend.host');
+        const backend_port: string = this.configService.getOrThrow<string>('backend.port');
 
         return ([
             `https://${domain_name}`,

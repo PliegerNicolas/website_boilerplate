@@ -4,8 +4,8 @@ import { JwtConfigEnvValidation } from "../env-validation/jwt.env-validation";
 
 export const jwtEnvConfig = registerAs('jwt', () => {
     const config = {
-        jwtSecret: process.env.JWT_SECRET,
-        jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+        accessTokenSecret: process.env.JWT_ACCESS_SECRET,
+        refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
         accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
         refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION,
     };

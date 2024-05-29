@@ -11,10 +11,10 @@ export class RateLimiterConfigService {
 
     constructor(private readonly configService: ConfigService) {
         const redisOptions: RedisOptions = {
-            host: this.configService.get<string>('redis.host', 'localhost'),
-            port: this.configService.get<number>('redis.port', 6379),
-            username: this.configService.get<string>('redis.user', 'default'),
-            password: this.configService.get<string>('redis.password', 'default'),
+            host: this.configService.getOrThrow<string>('redis.host'),
+            port: this.configService.getOrThrow<number>('redis.port'),
+            username: this.configService.getOrThrow<string>('redis.user'),
+            password: this.configService.getOrThrow<string>('redis.password'),
         };
 
         try {

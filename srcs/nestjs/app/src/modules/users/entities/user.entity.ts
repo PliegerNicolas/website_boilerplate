@@ -1,5 +1,5 @@
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, TableInheritance, UpdateDateColumn } from "typeorm";
-import { RegistrationMethod } from "../models/enums/registration-method.enum";
+import { RegistrationMethodEnum } from "../models/enums/registration-method.enum";
 import { IsEnum } from "class-validator";
 import { Exclude } from "class-transformer";
 
@@ -17,8 +17,8 @@ export class User {
     displayName: string;
 
     @Column()
-    @IsEnum({ type: 'enum', enum: RegistrationMethod })
-    registrationMethod: RegistrationMethod;
+    @IsEnum({ type: 'enum', enum: RegistrationMethodEnum })
+    registrationMethod: RegistrationMethodEnum;
 
     @Column({ nullable: true })
     @Exclude()
@@ -43,7 +43,7 @@ export class User {
     }
 
     private shouldPasswordExist(): boolean {
-        return (this.registrationMethod === RegistrationMethod.LOCAL);
+        return (this.registrationMethod === RegistrationMethodEnum.LOCAL);
     }
 
     /* Helper methods */

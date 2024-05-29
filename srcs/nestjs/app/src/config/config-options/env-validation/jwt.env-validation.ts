@@ -4,11 +4,11 @@ export class JwtConfigEnvValidation {
 
     @IsNotEmpty()
     @IsString()
-    jwtSecret: string;
+    accessTokenSecret: string;
 
     @IsNotEmpty()
     @IsString()
-    jwtRefreshSecret: string;
+    refreshTokenSecret: string;
 
     @IsNotEmpty()
     @IsString()

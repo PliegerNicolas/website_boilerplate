@@ -10,11 +10,11 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
     createTypeOrmOptions(connectionName?: string | undefined): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
         return ({
             type: 'postgres',
-            host: this.configService.get<string>('database.for_nestjs.host', 'localhost'),
-            port: this.configService.get<number>('database.for_nestjs.port', 5432),
-            database: this.configService.get<string>('database.for_nestjs.db', 'default'),
-            username: this.configService.get<string>('database.for_nestjs.user', 'default'),
-            password: this.configService.get<string>('database.for_nestjs.password', 'default'),
+            host: this.configService.getOrThrow<string>('database.for_nestjs.host'),
+            port: this.configService.getOrThrow<number>('database.for_nestjs.port'),
+            database: this.configService.getOrThrow<string>('database.for_nestjs.db'),
+            username: this.configService.getOrThrow<string>('database.for_nestjs.user'),
+            password: this.configService.getOrThrow<string>('database.for_nestjs.password'),
             autoLoadEntities: true,
             synchronize: true,
         });

@@ -1,8 +1,8 @@
-import { RegistrationMethod } from "../../enums/registration-method.enum";
+import { RegistrationMethodEnum } from "../../enums/registration-method.enum";
 
 export type GetUsersQueryParams = {
  
     readonly displayName?: string;
-    readonly registrationMethod?: RegistrationMethod;
+    readonly registrationMethod?: RegistrationMethodEnum;
     
 }

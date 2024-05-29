@@ -39,7 +39,7 @@ export class RequiredIfValidator implements ValidatorConstraintInterface {
         if (object[args.key] === args.expectedValue) {
             return (`With '${args.key}: ${args.expectedValue}' set, a value is expected for ${property}`);
         } else {
-            return (`With '${args.key}: ${args.expectedValue}' set, no value is expected for ${property}`);        
+            return (`With '${args.key}: ${object[args.key]}' set, no value is expected for ${property}`);        
         }
     }
 }
