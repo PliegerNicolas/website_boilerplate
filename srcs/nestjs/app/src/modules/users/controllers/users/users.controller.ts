@@ -31,14 +31,6 @@ export class UsersController {
         return (await this.userService.getUser(username));
     }
 
-    @Post()
-    @ApiOperation({ summary: 'Create a new user.' })
-    async createUser(
-        @Body() userDetails: CreateUserDto,
-    ): Promise<User> {
-        return (await this.userService.createUser(userDetails));
-    }
-
     @Put(':username')
     @ApiOperation({ summary: 'Replace a user by username.' })
     async replaceUser(
