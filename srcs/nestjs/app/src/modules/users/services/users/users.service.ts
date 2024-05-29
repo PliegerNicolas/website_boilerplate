@@ -18,7 +18,7 @@ export class UsersService {
     async getUsers(queryParams: GetUsersQueryParams): Promise<User[]> {
         const users: User[] = await this.userRepository.find({
             where: {
-                displayName: queryParams.displayName ? Like(`${queryParams.displayName}%`) : undefined,
+                username: queryParams.username ? Like(`${queryParams.username}%`) : undefined,
                 registrationMethod: queryParams.registrationMethod ? Equal(queryParams.registrationMethod) : undefined,
             },
         });
@@ -26,10 +26,10 @@ export class UsersService {
         return (users);
     }
 
-    async getUser(displayName: string): Promise<User> {
-        const user: User | null = await this.findUserByDisplayName(displayName);
+    async getUser(username: string): Promise<User> {
+        const user: User | null = await this.findUserByUsername(username);
 
-        if (!user) throw new NotFoundException(`User ${displayName} not found`);
+        if (!user) throw new NotFoundException(`User ${username} not found`);
 
         return (user);
     }
@@ -40,29 +40,29 @@ export class UsersService {
         return(await this.userRepository.save(user));
     }
 
-    async replaceUser(targetDisplayName: string, userDetails: ReplaceUserParams): Promise<User> {
-        const user: User | null = await this.findUserByDisplayName(targetDisplayName);
+    async replaceUser(targetusername: string, userDetails: ReplaceUserParams): Promise<User> {
+        const user: User | null = await this.findUserByUsername(targetusername);
 
-        if (!user) throw new NotFoundException(`User ${userDetails.displayName} not found`);
-
-        return (user);
-    }
-
-    async updateUser(targetDisplayName: string, userDetails: UpdateUserParams): Promise<User> {
-        const user: User | null = await this.findUserByDisplayName(targetDisplayName);
-
-        if (!user) throw new NotFoundException(`User ${userDetails.displayName} not found`);
+        if (!user) throw new NotFoundException(`User ${userDetails.username} not found`);
 
         return (user);
     }
 
-    async deleteUser(targetDisplayName: string): Promise<string> {
-        const user: User | null = await this.findUserByDisplayName(targetDisplayName);
+    async updateUser(targetusername: string, userDetails: UpdateUserParams): Promise<User> {
+        const user: User | null = await this.findUserByUsername(targetusername);
 
-        if (!user) throw new NotFoundException(`User ${targetDisplayName} not found`);
+        if (!user) throw new NotFoundException(`User ${userDetails.username} not found`);
+
+        return (user);
+    }
+
+    async deleteUser(targetusername: string): Promise<string> {
+        const user: User | null = await this.findUserByUsername(targetusername);
+
+        if (!user) throw new NotFoundException(`User ${targetusername} not found`);
     
         await this.userRepository.remove(user);
-        return (`User ${targetDisplayName} successfully deleted`);
+        return (`User ${targetusername} successfully deleted`);
     }
 
     /* Other functions */
@@ -87,10 +87,10 @@ export class UsersService {
         return (user);
     }
 
-    async findUserByDisplayName(displayName: string): Promise<User | null> {
+    async findUserByUsername(username: string): Promise<User | null> {
         const user: User | null = await this.userRepository.findOne({
             where: {
-                displayName: Equal(displayName),
+                username: Equal(username),
             }
         });
         

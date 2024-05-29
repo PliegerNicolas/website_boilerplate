@@ -5,18 +5,18 @@ import { RequiredIf } from "src/utils/validators/required-if/required-if.decorat
 
 export class CreateUserDto {
 
-    @ApiProperty({ description: 'Email.' })
+    @ApiProperty({ description: 'Email' })
     @IsNotEmpty()
     @IsString()
     @IsEmail()
     readonly email: string;
 
-    @ApiProperty({ description: 'Display name / username.' })
+    @ApiProperty({ description: 'Username' })
     @IsNotEmpty()
     @IsString()
-    readonly displayName: string;
+    readonly username: string;
 
-    @ApiProperty({ description: 'Through wich method they registered (Local, Oauth2_google, ...).' })
+    @ApiProperty({ description: 'Through wich method they registered (Local, Oauth2_google, ...)' })
     @IsNotEmpty()
     @IsEnum(RegistrationMethodEnum)
     readonly registrationMethod: RegistrationMethodEnum;

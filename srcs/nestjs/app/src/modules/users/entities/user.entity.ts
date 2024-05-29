@@ -14,7 +14,7 @@ export class User {
     email: string;
 
     @Column({ unique: true })
-    displayName: string;
+    username: string;
 
     @Column()
     @IsEnum({ type: 'enum', enum: RegistrationMethodEnum })

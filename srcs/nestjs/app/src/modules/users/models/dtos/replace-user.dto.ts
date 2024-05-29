@@ -5,26 +5,23 @@ import { RequiredIf } from "src/utils/validators/required-if/required-if.decorat
 
 export class ReplaceUserDto {
 
-    @ApiProperty({ description: 'Email.' })
-    @IsDefined()
+    @ApiProperty({ description: 'Email' })
     @IsNotEmpty()
     @IsString()
     @IsEmail()
     readonly email: string;
 
-    @ApiProperty({ description: 'Display name / username.' })
-    @IsDefined()
+    @ApiProperty({ description: 'Username' })
     @IsNotEmpty()
     @IsString()
-    readonly displayName: string;
+    readonly username: string;
 
-    @ApiProperty({ description: 'Through wich method they registered (Local, Oauth2_google, ...).' })
-    @IsDefined()
+    @ApiProperty({ description: 'Through wich method they registered (Local, Oauth2_google, ...)' })
     @IsNotEmpty()
     @IsEnum(RegistrationMethodEnum)
     readonly registrationMethod: RegistrationMethodEnum;
 
-    @ApiProperty({ description: 'Password. It\'s presence is only necessary with local registration method.' })
+    @ApiProperty({ description: 'Password. It\'s presence is only necessary with local registration method' })
     @RequiredIf({
         key: 'registrationMethod',
         expectedValue: RegistrationMethodEnum.LOCAL

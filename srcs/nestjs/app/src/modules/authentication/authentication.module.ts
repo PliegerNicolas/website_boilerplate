@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { HashingModule } from 'src/utils/hashing/hashing.module';
 import { ConfigModule } from '@nestjs/config';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
     controllers: [AuthenticationController],
     providers: [
         AuthenticationService,
+        LocalStrategy,
     ],
     exports: [],
 })

@@ -23,12 +23,12 @@ export class UsersController {
         return (await this.userService.getUsers(GetUsersQueryDto));
     }
 
-    @Get(':displayName')
-    @ApiOperation({ summary: 'Retrieve a user by displayName.' })
+    @Get(':username')
+    @ApiOperation({ summary: 'Retrieve a user by username.' })
     async getUser(
-        @Param('displayName') displayName: string,
+        @Param('username') username: string,
     ): Promise <User> {
-        return (await this.userService.getUser(displayName));
+        return (await this.userService.getUser(username));
     }
 
     @Post()
@@ -39,30 +39,30 @@ export class UsersController {
         return (await this.userService.createUser(userDetails));
     }
 
-    @Put(':displayName')
-    @ApiOperation({ summary: 'Replace a user by displayName.' })
+    @Put(':username')
+    @ApiOperation({ summary: 'Replace a user by username.' })
     async replaceUser(
-        @Param('displayName') displayName: string,
+        @Param('username') username: string,
         @Body() userDetails: ReplaceUserDto,
     ): Promise<User> {
-        return (await this.userService.replaceUser(displayName, userDetails));
+        return (await this.userService.replaceUser(username, userDetails));
     }
 
-    @Patch(':displayName')
-    @ApiOperation({ summary: 'Partially update a user by displayName.' })
+    @Patch(':username')
+    @ApiOperation({ summary: 'Partially update a user by username.' })
     async updateUser(
-        @Param('displayName') displayName: string,
+        @Param('username') username: string,
         @Body() userDetails: UpdateUserDto,
     ): Promise<User> {
-        return (await this.userService.updateUser(displayName, userDetails));
+        return (await this.userService.updateUser(username, userDetails));
     }
 
-    @Delete(':displayName')
-    @ApiOperation({ summary: 'Delete a user by displayName.' })
+    @Delete(':username')
+    @ApiOperation({ summary: 'Delete a user by username.' })
     async deleteUser(
-        @Param('displayName') displayName: string,
+        @Param('username') username: string,
     ): Promise<string> {
-        return (await this.userService.deleteUser(displayName));
+        return (await this.userService.deleteUser(username));
     }
 
 }

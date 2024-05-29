@@ -4,12 +4,12 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class GetUsersQueryDto {
  
-    @ApiProperty({ description: 'Prefix of displayName to filter with.', required: false })
+    @ApiProperty({ description: 'Prefix of username to filter with', required: false })
     @IsOptional()
     @IsString()
-    readonly displayName?: string;
+    readonly username?: string;
 
-    @ApiProperty({ description: 'Prefix of registrationMethod to filter with.', required: false })
+    @ApiProperty({ description: 'Prefix of registrationMethod to filter with', required: false })
     @IsOptional()
     @IsEnum(RegistrationMethodEnum)
     readonly registrationMethod?: RegistrationMethodEnum;
