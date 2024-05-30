@@ -36,45 +36,18 @@ export class AuthenticationService {
         return (userPayload);
     }
 
-    async loginLocalUser(userDetails: LocalLoginParams, res: Response): Promise<UserPayloadParams> {
-        const user: User | null = await this.usersService.findUserByUsername(userDetails.username);
+    async registerGoogleUser(googleUserDetails: GoogleRegisterParams): Promise<UserPayloadParams> {
+        const user: User = await this.usersService.createUser(googleUserDetails);
 
-        if (!user) throw new NotFoundException(`User ${userDetails.username} not found.`);
-
-        const userPayload: UserPayloadParams = {
+        const googleUserPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
-        };
+        }
 
-        const jwtTokens: JwtTokensParams = {
-            accessToken: await this.generateAccessToken(userPayload),
-            refreshToken: await this.generateRefreshToken(userPayload),
-        };
-
-        const cookieOptions: any = {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            priority: 'high',
-        };
-
-        if (jwtTokens.accessToken) this.storeTokenInCookie(res, jwtTokens.accessToken, cookieOptions);
-        if (jwtTokens.refreshToken) this.storeTokenInCookie(res, jwtTokens.refreshToken, cookieOptions);
-
-        return (userPayload);
+        return (googleUserPayload);
     }
 
-    async loginAndRegisterGoogleUser(googleProfile: any, res: Response): Promise<UserPayloadParams> {
-        const email: string | null = googleProfile.emails.find((email: any) => email.verified)?.value;
-        if (!email) throw new UnauthorizedException(`Google Oauth2 protocol didn't provide a valid and verified email address.`);
-
-        const user: User = await this.usersService.findUserByEmail(email) || await this.createGoogleUser(googleProfile, email);
-
-        const userPayload: UserPayloadParams = {
-            uuid: user.uuid,
-            username: user.username,
-        };
-
+    async loginUser(userPayload: UserPayloadParams, res: Response): Promise<UserPayloadParams> {
         const jwtTokens: JwtTokensParams = {
             accessToken: await this.generateAccessToken(userPayload),
             refreshToken: await this.generateRefreshToken(userPayload),
@@ -110,7 +83,7 @@ export class AuthenticationService {
         return (userPayload);
     }
 
-    async validateGoogleUser(googleUserDetails: GoogleLoginParams): Promise<UserPayloadParams | null> {
+    async validateGoogleUser(googleUserDetails: GoogleRegisterParams): Promise<UserPayloadParams | null> {
         const user: User | null = await this.usersService.findUserByEmail(googleUserDetails.email);
 
         if (!user) return (null);

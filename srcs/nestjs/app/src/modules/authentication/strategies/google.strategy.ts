@@ -6,6 +6,8 @@ import { UserPayloadParams } from "../models/types/jwt/payloads.type";
 import { Request } from "express";
 import { ConfigService } from "@nestjs/config";
 import { GoogleLoginParams } from "../models/types/google/google-login.type";
+import { GoogleRegisterParams } from "../models/types/google/google-register.type";
+import { RegistrationMethodEnum } from "src/modules/users/models/enums/registration-method.enum";
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -30,16 +32,21 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         profile: any,
         done: VerifyCallback
     ): Promise<UserPayloadParams> {
-        const email: string | null = profile.emails.find((email: any) => email.verified)?.value;
-        if (!email) throw new UnauthorizedException('Google oauth2 protocol didn\'t return a valid and verified email address.');
-        
-        const googleUserDetails: GoogleLoginParams = {
-            email: email,
+        const googleUserDetails: GoogleRegisterParams = {
+            email: profile.emails.find((email: any) => email.verified)?.value,
+            username: profile.displayName,
+            registrationMethod: RegistrationMethodEnum.GOOGLE_OAUTH2,
+            password: undefined,
         }
 
-        const userPayload: UserPayloadParams | null = await this.authenticationService.validateGoogleUser(googleUserDetails);
+        if (!googleUserDetails.email) throw new UnauthorizedException('Google oauth2 protocol didn\'t return a valid and verified email address.');
+    
+        const userPayload: UserPayloadParams | null = (
+            await this.authenticationService.validateGoogleUser(googleUserDetails)
+            || await this.authenticationService.registerGoogleUser(googleUserDetails)
+        );
 
-        if (!userPayload) throw new UnauthorizedException(); // Add explicit msg.
+        if (!userPayload) throw new UnauthorizedException(); // TODO.
 
         return (userPayload);
     }

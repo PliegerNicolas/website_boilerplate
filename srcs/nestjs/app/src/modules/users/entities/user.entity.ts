@@ -10,12 +10,12 @@ export class User {
     uuid: string;
 
     @Column({ unique: true })
-    //@Exclude()
     email: string;
 
     @Column({ unique: true })
     username: string;
 
+    @Exclude()
     @Column()
     @IsEnum({ type: 'enum', enum: RegistrationMethodEnum })
     registrationMethod: RegistrationMethodEnum;

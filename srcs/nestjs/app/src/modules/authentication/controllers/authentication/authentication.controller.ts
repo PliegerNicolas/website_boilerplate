@@ -1,15 +1,12 @@
 import { Body, Controller, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LocalRegisterDto } from '../../models/dtos/local/register.dto';
 import { LocalLoginDto } from '../../models/dtos/local/login.dto';
-import { GoogleRegisterDto } from '../../models/dtos/google/register.dto';
-import { GoogleLoginDto } from '../../models/dtos/google/login.dto';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { UserPayloadParams } from '../../models/types/jwt/payloads.type';
 import { Request, Response } from 'express';
 import { GoogleOAuthGuard } from '../../guards/google-auth.guard';
-import { GoogleLoginParams } from '../../models/types/google/google-login.type';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,45 +28,38 @@ export class AuthenticationController {
 
     @Post('local/login')
     @ApiOperation({ summary: 'Login through local strategy.' })
+    @ApiBody({ type: LocalLoginDto })
     @UseGuards(LocalAuthGuard)
     async loginLocal(
-        @Body() localDetails: LocalLoginDto,
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        const userPayload: UserPayloadParams = await this.authenticationService.loginLocalUser(localDetails, res);
+        const userPayload: UserPayloadParams = req.user as UserPayloadParams;
+        await this.authenticationService.loginUser(userPayload, res);
         res.status(HttpStatus.OK).json(userPayload);
     }
 
     /* Google strategy */
 
     @Get('google/register')
-    @ApiOperation({ summary: 'Login and register through google oauth2 strategy. It is equivalent to /api/auth/google/login path.' })
+    @ApiOperation({ summary: 'Register through google oauth2 strategy.' })
     @UseGuards(GoogleOAuthGuard)
     async registerGoogle(
         @Req() req: Request,
-        @Res() res: Response,
     ) {
-        console.log(req);
-        const googleUserDetails: GoogleLoginParams = {
-            email: 'oui',
-        };
-        const userPayload: UserPayloadParams = await this.authenticationService.loginAndRegisterGoogleUser(googleUserDetails, res);
-        res.status(HttpStatus.OK).json(userPayload);
+        const userPayload: UserPayloadParams = req.user as UserPayloadParams;
+        return (userPayload);
     }
 
     @Get('google/login')
-    @ApiOperation({ summary: 'Login and register through google oauth2 strategy. It is equivalent to /api/auth/google/register path.' })
+    @ApiOperation({ summary: 'Login (and register) through google oauth2 strategy.' })
     @UseGuards(GoogleOAuthGuard)
     async loginGoogle(
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        console.log(req);
-        const googleUserDetails: GoogleLoginParams = {
-            email: 'oui',
-        };
-        const userPayload: UserPayloadParams = await this.authenticationService.loginAndRegisterGoogleUser(googleUserDetails, res);
+        const userPayload: UserPayloadParams = req.user as UserPayloadParams;
+        await this.authenticationService.loginUser(userPayload, res);
         res.status(HttpStatus.OK).json(userPayload);
     }
 
@@ -79,9 +69,9 @@ export class AuthenticationController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        // ????
-        //res.redirect('./');
-        return ("Pomme");
+        const userPayload: UserPayloadParams = req.user as UserPayloadParams;
+        await this.authenticationService.loginUser(userPayload, res);
+        res.status(HttpStatus.OK).json(userPayload);
     }
 
     /* General */
@@ -91,7 +81,7 @@ export class AuthenticationController {
     async logout(
 
     ) {
-        return (null);
+        return (null); // TODO
     }
 
     /* JWT tokens */
@@ -101,7 +91,7 @@ export class AuthenticationController {
     async refreshAccessToken(
 
     ) {
-        return (null);
+        return (null); // TODO
     }
 
 }
