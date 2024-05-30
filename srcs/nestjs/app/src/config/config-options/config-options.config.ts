@@ -5,6 +5,7 @@ import { frontendEnvConfig } from "./env-variables/frontend.env-config";
 import { globalEnvConfig } from "./env-variables/global.env-config";
 import { jwtEnvConfig } from "./env-variables/jwt.env-config";
 import { redisEnvConfig } from "./env-variables/redis.env-config";
+import { GoogleClientEnvConfig } from "./env-variables/google-client.env-config";
 
 export const ConfigOptions: ConfigModuleOptions = {
     isGlobal: true,
@@ -22,5 +23,6 @@ export const ConfigOptions: ConfigModuleOptions = {
         databaseEnvConfig,
         redisEnvConfig,
         jwtEnvConfig,
+        GoogleClientEnvConfig,
     ],
 };

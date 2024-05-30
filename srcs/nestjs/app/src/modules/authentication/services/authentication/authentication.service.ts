@@ -12,6 +12,7 @@ import { GoogleRegisterParams } from '../../models/types/google/google-register.
 import { JwtTokenParams, JwtTokensParams } from '../../models/types/jwt/tokens.type';
 import { JwtTokenEnum } from '../../models/enums/jwt-tokens.enum';
 import { Response } from 'express';
+import { RegistrationMethodEnum } from 'src/modules/users/models/enums/registration-method.enum';
 
 @Injectable()
 export class AuthenticationService {
@@ -63,12 +64,33 @@ export class AuthenticationService {
         return (userPayload);
     }
 
-    async registerGoogleUser(userDetails: GoogleRegisterParams) {
-        return (null);
-    }
+    async loginAndRegisterGoogleUser(googleProfile: any, res: Response): Promise<UserPayloadParams> {
+        const email: string | null = googleProfile.emails.find((email: any) => email.verified)?.value;
+        if (!email) throw new UnauthorizedException(`Google Oauth2 protocol didn't provide a valid and verified email address.`);
 
-    async loginGoogleUser(userDetails: GoogleRegisterParams) {
-        return (null);
+        const user: User = await this.usersService.findUserByEmail(email) || await this.createGoogleUser(googleProfile, email);
+
+        const userPayload: UserPayloadParams = {
+            uuid: user.uuid,
+            username: user.username,
+        };
+
+        const jwtTokens: JwtTokensParams = {
+            accessToken: await this.generateAccessToken(userPayload),
+            refreshToken: await this.generateRefreshToken(userPayload),
+        };
+
+        const cookieOptions: any = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            priority: 'high',
+        };
+
+        if (jwtTokens.accessToken) this.storeTokenInCookie(res, jwtTokens.accessToken, cookieOptions);
+        if (jwtTokens.refreshToken) this.storeTokenInCookie(res, jwtTokens.refreshToken, cookieOptions);
+
+        return (userPayload);
     }
 
     /* User validation: used in strategies. */
@@ -88,18 +110,25 @@ export class AuthenticationService {
         return (userPayload);
     }
 
-    async validateGoogleUser(userDetails: GoogleLoginParams): Promise<UserPayloadParams | null> {
-        // TODO
+    async validateGoogleUser(googleUserDetails: GoogleLoginParams): Promise<UserPayloadParams | null> {
+        const user: User | null = await this.usersService.findUserByEmail(googleUserDetails.email);
 
-        return (null);
+        if (!user) return (null);
+
+        const userPayload: UserPayloadParams = {
+            uuid: user.uuid,
+            username: user.username,
+        };
+
+        return (userPayload);
     }
 
     /* JWT tokens */
 
     private async generateAccessToken(userPayload: UserPayloadParams): Promise<JwtTokenParams> {
         const accessTokenOptions: any = {
-            secret: this.configService.getOrThrow('jwt.refreshTokenSecret'),
-            expiresIn: this.configService.getOrThrow('jwt.refreshTokenExpiration'),
+            secret: this.configService.getOrThrow('jwt.accessTokenSecret'),
+            expiresIn: this.configService.getOrThrow('jwt.accessTokenExpiration'),
         };
 
         const accessToken: JwtTokenParams = {
@@ -147,4 +176,19 @@ export class AuthenticationService {
         });
     }
 
+    /* Other */
+
+    private async createGoogleUser(googleProfile: any, email: string): Promise<User> {
+        const googleUserDetails: GoogleRegisterParams = {
+            email: email,
+            username: googleProfile.displayName,
+            registrationMethod: RegistrationMethodEnum.GOOGLE_OAUTH2,
+            password: undefined,
+        };
+
+        const user: User = await this.usersService.createUser(googleUserDetails);
+
+        return (user);
+    }
+    
 }

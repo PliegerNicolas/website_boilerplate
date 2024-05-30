@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         });
     }
 
-    async validate(username: string, password: string) {
+    async validate(username: string, password: string): Promise<UserPayloadParams> {
         const userDetails: LocalLoginDto = {
             username: username,
             password: password,

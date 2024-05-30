@@ -8,6 +8,8 @@ import { GoogleLoginDto } from '../../models/dtos/google/login.dto';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { UserPayloadParams } from '../../models/types/jwt/payloads.type';
 import { Request, Response } from 'express';
+import { GoogleOAuthGuard } from '../../guards/google-auth.guard';
+import { GoogleLoginParams } from '../../models/types/google/google-login.type';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -42,19 +44,44 @@ export class AuthenticationController {
     /* Google strategy */
 
     @Get('google/register')
-    @ApiOperation({ summary: 'Register through google oauth2 strategy.' })
+    @ApiOperation({ summary: 'Login and register through google oauth2 strategy. It is equivalent to /api/auth/google/login path.' })
+    @UseGuards(GoogleOAuthGuard)
     async registerGoogle(
-        @Body() googleDetails: GoogleRegisterDto,
+        @Req() req: Request,
+        @Res() res: Response,
     ) {
-        return (null);
+        console.log(req);
+        const googleUserDetails: GoogleLoginParams = {
+            email: 'oui',
+        };
+        const userPayload: UserPayloadParams = await this.authenticationService.loginAndRegisterGoogleUser(googleUserDetails, res);
+        res.status(HttpStatus.OK).json(userPayload);
     }
 
     @Get('google/login')
-    @ApiOperation({ summary: 'Login through google oauth2 strategy.' })
+    @ApiOperation({ summary: 'Login and register through google oauth2 strategy. It is equivalent to /api/auth/google/register path.' })
+    @UseGuards(GoogleOAuthGuard)
     async loginGoogle(
-        @Body() googleDetails: GoogleLoginDto,
+        @Req() req: Request,
+        @Res() res: Response,
     ) {
-        return (null);
+        console.log(req);
+        const googleUserDetails: GoogleLoginParams = {
+            email: 'oui',
+        };
+        const userPayload: UserPayloadParams = await this.authenticationService.loginAndRegisterGoogleUser(googleUserDetails, res);
+        res.status(HttpStatus.OK).json(userPayload);
+    }
+
+    @Get('google/callback')
+    @UseGuards(GoogleOAuthGuard)
+    async googleOauth2Callback(
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+        // ????
+        //res.redirect('./');
+        return ("Pomme");
     }
 
     /* General */

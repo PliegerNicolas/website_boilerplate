@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { HashingModule } from 'src/utils/hashing/hashing.module';
 import { ConfigModule } from '@nestjs/config';
 import { LocalStrategy } from './strategies/local.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     providers: [
         AuthenticationService,
         LocalStrategy,
+        GoogleStrategy,
     ],
     exports: [],
 })
