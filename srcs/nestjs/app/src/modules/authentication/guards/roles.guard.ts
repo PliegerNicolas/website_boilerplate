@@ -7,6 +7,7 @@ import { UserPayloadParams } from "../models/types/jwt/payloads.type";
 import { User } from "src/modules/users/entities/user.entity";
 import { UsersService } from "src/modules/users/services/users/users.service";
 import { AuthGuard } from "@nestjs/passport";
+import { ROLE_KEY } from "../decorators/roles.decorator";
 
 @Injectable()
 export class RolesGuard extends AuthGuard('role')  {
@@ -18,14 +19,14 @@ export class RolesGuard extends AuthGuard('role')  {
         super();
     }
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
 
-        const roles = this.reflector.get<RoleEnum[]>(null, context.getHandler()); // TODO.
+        const roles = this.reflector.get<RoleEnum[]>(ROLE_KEY, context.getHandler()); // TODO.
 
         if (!roles) return (true);
 
         const request: Request = context.switchToHttp().getRequest();
-        const userPayload: UserPayloadParams = request..user as UserPayloadParams;
+        const userPayload: UserPayloadParams = request.user as UserPayloadParams;
 
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);
         if (!user) return (false);
