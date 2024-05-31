@@ -1,7 +1,6 @@
-import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Request } from "express";
-import { Observable } from "rxjs";
 import { RoleEnum } from "src/modules/users/models/enums/role.enum";
 import { UserPayloadParams } from "../models/types/jwt/payloads.type";
 import { User } from "src/modules/users/entities/user.entity";
@@ -31,14 +30,14 @@ export class RolesGuard extends AuthGuard('role')  {
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);
         if (!user) return (false);
 
-        if (!roles.some((role) => role === user.role)) throw new UnauthorizedException('Invalid role');
+        if (!roles.some((role) => role === user.role)) throw new ForbiddenException('Not enough permissions.');
 
         return (true);
     }
 
     handleRequest<TUser = any>(err: any, user: any, info: any, context: ExecutionContext, status?: any): TUser {
         if (err || !user) {
-            throw new UnauthorizedException('Unauthorized. Not enough permissions.');
+            throw new ForbiddenException(); // TODO.
         }
 
         return (user);

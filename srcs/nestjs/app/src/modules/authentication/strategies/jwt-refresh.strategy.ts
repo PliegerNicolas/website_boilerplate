@@ -27,10 +27,11 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
         });
     }
 
-    async validate(req: Request, payload: UserPayloadParams): Promise<UserPayloadParams> {
+    async validate(req: Request, payload: any): Promise<UserPayloadParams> {
         const userPayload: UserPayloadParams = {
             uuid: payload.uuid,
             username: payload.username,
+            role: payload.role,
         };
 
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);

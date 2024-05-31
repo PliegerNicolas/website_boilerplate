@@ -60,7 +60,7 @@ export class UsersController {
 
     @Delete(':username')
     @ApiOperation({ summary: 'Delete a user by username.' })
-    @Roles(RoleEnum.USER) // Should add a ME.
+    @Roles(RoleEnum.ADMIN) // Should add a ME.
     async deleteUser(
         @Param('username') username: string,
     ): Promise<string> {

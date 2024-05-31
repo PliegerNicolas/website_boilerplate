@@ -1,18 +1,18 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/services/users/users.service';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
 import { ConfigService } from '@nestjs/config';
 import { UserPayloadParams } from '../../models/types/jwt/payloads.type';
 import { LocalLoginParams } from '../../models/types/local/local-login.type';
-import { GoogleLoginParams } from '../../models/types/google/google-login.type';
 import { User } from 'src/modules/users/entities/user.entity';
 import { LocalRegisterParams } from '../../models/types/local/local-register.type';
 import { GoogleRegisterParams } from '../../models/types/google/google-register.type';
 import { JwtTokenParams, JwtTokensParams } from '../../models/types/jwt/tokens.type';
 import { JwtTokenEnum } from '../../models/enums/jwt-tokens.enum';
 import { Response } from 'express';
-import { RegistrationMethodEnum } from 'src/modules/users/models/enums/registration-method.enum';
+import { accessTokenOptions, refreshTokenOptions } from '../../models/constants/token-options.const';
+import { secureCookieOptions } from '../../models/constants/cookie-options.const';
 
 @Injectable()
 export class AuthenticationService {
@@ -31,6 +31,7 @@ export class AuthenticationService {
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
+            role: user.role,
         };
 
         return (userPayload);
@@ -42,6 +43,7 @@ export class AuthenticationService {
         const googleUserPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
+            role: user.role,
         }
 
         return (googleUserPayload);
@@ -53,16 +55,9 @@ export class AuthenticationService {
             refreshToken: await this.generateRefreshToken(userPayload),
         };
 
-        const cookieOptions: any = {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            priority: 'high',
-        };
-
-        if (jwtTokens.accessToken) await this.storeTokenInCookie(res, jwtTokens.accessToken, cookieOptions);
+        if (jwtTokens.accessToken) await this.storeTokenInCookie(res, jwtTokens.accessToken, secureCookieOptions);
         if (jwtTokens.refreshToken) {
-            await this.storeTokenInCookie(res, jwtTokens.refreshToken, cookieOptions);
+            await this.storeTokenInCookie(res, jwtTokens.refreshToken, secureCookieOptions);
             await this.usersService.updateRefreshToken(userPayload.uuid, jwtTokens.refreshToken.value);
         }
 
@@ -81,6 +76,7 @@ export class AuthenticationService {
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
+            role: user.role,
         };
 
         return (userPayload);
@@ -94,6 +90,7 @@ export class AuthenticationService {
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
+            role: user.role,
         };
 
         return (userPayload);
@@ -102,44 +99,34 @@ export class AuthenticationService {
     /* JWT tokens */
 
     private async generateAccessToken(userPayload: UserPayloadParams): Promise<JwtTokenParams> {
-        const accessTokenOptions: any = {
-            secret: this.configService.getOrThrow('jwt.accessTokenSecret'),
-            expiresIn: this.configService.getOrThrow('jwt.accessTokenExpiration'),
-        };
-
         const accessToken: JwtTokenParams = {
             name: JwtTokenEnum.ACCESS,
-            value: await this.jwtService.signAsync(userPayload, accessTokenOptions),
+            value: await this.jwtService.signAsync(userPayload, accessTokenOptions(this.configService)),
             expiresIn: new Date(),
         };
 
         try {
-            const tokenPayload: any = await this.jwtService.verifyAsync(accessToken.value, accessTokenOptions);
+            const tokenPayload: any = await this.jwtService.verifyAsync(accessToken.value, accessTokenOptions(this.configService));
             accessToken.expiresIn = new Date(tokenPayload.exp * 1000);
         } catch(error) {
-            throw new UnauthorizedException('Invalid JWT token received.');
+            throw new UnauthorizedException('Invalid JWT token received. It might have been tinkered with.');
         }
 
         return (accessToken);
     }
 
     private async generateRefreshToken(userPayload: UserPayloadParams): Promise<JwtTokenParams> {
-        const refreshTokenOptions: any = {
-            secret: this.configService.getOrThrow('jwt.refreshTokenSecret'),
-            expiresIn: this.configService.getOrThrow('jwt.refreshTokenExpiration'),
-        };
-
         const refreshToken: JwtTokenParams = {
             name: JwtTokenEnum.REFRESH,
-            value: await this.jwtService.signAsync(userPayload, refreshTokenOptions),
+            value: await this.jwtService.signAsync(userPayload, refreshTokenOptions(this.configService)),
             expiresIn: new Date(),
         };
 
         try {
-            const tokenPayload: any = await this.jwtService.verifyAsync(refreshToken.value, refreshTokenOptions);
+            const tokenPayload: any = await this.jwtService.verifyAsync(refreshToken.value, refreshTokenOptions(this.configService));
             refreshToken.expiresIn = new Date(tokenPayload.exp * 1000);
         } catch(error) {
-            throw new UnauthorizedException('Invalid JWT token received.');
+            throw new UnauthorizedException('Invalid JWT token received. It might have been tinkered with.');
         }
 
         return (refreshToken);
@@ -153,20 +140,9 @@ export class AuthenticationService {
     }
 
     async refreshAccessToken(userPayload: UserPayloadParams, res: Response): Promise<UserPayloadParams> {
-        console.log(userPayload);
-
         const accessToken: JwtTokenParams = await this.generateAccessToken(userPayload);
 
-        console.log(accessToken);
-
-        const cookieOptions: any = {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            priority: 'high',
-        };
-
-        await this.storeTokenInCookie(res, accessToken, cookieOptions);
+        await this.storeTokenInCookie(res, accessToken, secureCookieOptions);
         return (userPayload);
     }
     

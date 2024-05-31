@@ -24,10 +24,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         });
     }
 
-    async validate(payload: UserPayloadParams): Promise<UserPayloadParams> {
+    async validate(payload: any): Promise<UserPayloadParams> {
         const userPayload: UserPayloadParams = {
             uuid: payload.uuid,
             username: payload.username,
+            role: payload.role,
         };
 
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);
