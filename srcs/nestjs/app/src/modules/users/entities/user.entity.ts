@@ -2,6 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGe
 import { RegistrationMethodEnum } from "../models/enums/registration-method.enum";
 import { IsEnum } from "class-validator";
 import { Exclude } from "class-transformer";
+import { RoleEnum } from "../models/enums/role.enum";
 
 @Entity({ name: 'users' })
 export class User {
@@ -15,14 +16,21 @@ export class User {
     @Column({ unique: true })
     username: string;
 
+    @Column({ type: 'enum', enum: RoleEnum, default: RoleEnum.USER })
+    role: RoleEnum;
+
     @Exclude()
     @Column()
     @IsEnum({ type: 'enum', enum: RegistrationMethodEnum })
     registrationMethod: RegistrationMethodEnum;
 
-    @Column({ nullable: true })
     @Exclude()
+    @Column({ nullable: true })
     password: string;
+    
+    @Exclude()
+    @Column({ nullable: true, default: null })
+    refreshToken: string;
 
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

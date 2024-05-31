@@ -11,8 +11,6 @@ export function validateConfig(validationClass: any, config: Record<string, unkn
         skipMissingProperties: false,
     });
 
-    console.log(validateConfig);
-
     if (errors.length > 0) {
         throw new Error(errors.toString());
     }

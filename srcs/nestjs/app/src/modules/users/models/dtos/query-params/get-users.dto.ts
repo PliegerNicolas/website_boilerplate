@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional, IsString } from "class-validator";
-import { RegistrationMethodEnum } from "../../enums/registration-method.enum";
 import { ApiProperty } from "@nestjs/swagger";
+import { RoleEnum } from "../../enums/role.enum";
 
 export class GetUsersQueryDto {
  
@@ -9,9 +9,9 @@ export class GetUsersQueryDto {
     @IsString()
     readonly username?: string;
 
-    @ApiProperty({ description: 'Prefix of registrationMethod to filter with', required: false })
+    @ApiProperty({ description: 'Prefix of role to filter with', required: false })
     @IsOptional()
-    @IsEnum(RegistrationMethodEnum)
-    readonly registrationMethod?: RegistrationMethodEnum;
+    @IsEnum(RoleEnum)
+    readonly role?: RoleEnum;
     
 }

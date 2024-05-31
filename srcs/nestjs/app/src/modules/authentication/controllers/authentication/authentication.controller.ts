@@ -7,6 +7,8 @@ import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { UserPayloadParams } from '../../models/types/jwt/payloads.type';
 import { Request, Response } from 'express';
 import { GoogleOAuthGuard } from '../../guards/google-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import JwtRefreshGuard from '../../guards/jwt-refresh.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -78,6 +80,7 @@ export class AuthenticationController {
 
     @Get('logout')
     @ApiOperation({ summary: 'Logout and invalidate JWT access and refresh tokens.' })
+    @UseGuards(JwtAuthGuard)
     async logout(
 
     ) {
@@ -88,10 +91,14 @@ export class AuthenticationController {
 
     @Get('refresh-access-token')
     @ApiOperation({ summary: 'Refresh JWT access token.' })
+    @UseGuards(JwtRefreshGuard)
     async refreshAccessToken(
-
+        @Req() req: Request,
+        @Res() res: Response,
     ) {
-        return (null); // TODO
+        const userPayload: UserPayloadParams = req.user as UserPayloadParams;
+        await this.authenticationService.refreshAccessToken(userPayload, res);
+        res.status(HttpStatus.OK).json(userPayload);
     }
 
 }

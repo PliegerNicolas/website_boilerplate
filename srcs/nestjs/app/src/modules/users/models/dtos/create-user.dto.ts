@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDefined, IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { RegistrationMethodEnum } from "../enums/registration-method.enum";
 import { RequiredIf } from "src/utils/validators/required-if/required-if.decorator";
 

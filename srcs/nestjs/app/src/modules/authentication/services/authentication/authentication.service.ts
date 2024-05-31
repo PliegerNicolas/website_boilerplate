@@ -60,8 +60,11 @@ export class AuthenticationService {
             priority: 'high',
         };
 
-        if (jwtTokens.accessToken) this.storeTokenInCookie(res, jwtTokens.accessToken, cookieOptions);
-        if (jwtTokens.refreshToken) this.storeTokenInCookie(res, jwtTokens.refreshToken, cookieOptions);
+        if (jwtTokens.accessToken) await this.storeTokenInCookie(res, jwtTokens.accessToken, cookieOptions);
+        if (jwtTokens.refreshToken) {
+            await this.storeTokenInCookie(res, jwtTokens.refreshToken, cookieOptions);
+            await this.usersService.updateRefreshToken(userPayload.uuid, jwtTokens.refreshToken.value);
+        }
 
         return (userPayload);
     }
@@ -149,19 +152,22 @@ export class AuthenticationService {
         });
     }
 
-    /* Other */
+    async refreshAccessToken(userPayload: UserPayloadParams, res: Response): Promise<UserPayloadParams> {
+        console.log(userPayload);
 
-    private async createGoogleUser(googleProfile: any, email: string): Promise<User> {
-        const googleUserDetails: GoogleRegisterParams = {
-            email: email,
-            username: googleProfile.displayName,
-            registrationMethod: RegistrationMethodEnum.GOOGLE_OAUTH2,
-            password: undefined,
+        const accessToken: JwtTokenParams = await this.generateAccessToken(userPayload);
+
+        console.log(accessToken);
+
+        const cookieOptions: any = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            priority: 'high',
         };
 
-        const user: User = await this.usersService.createUser(googleUserDetails);
-
-        return (user);
+        await this.storeTokenInCookie(res, accessToken, cookieOptions);
+        return (userPayload);
     }
     
 }
