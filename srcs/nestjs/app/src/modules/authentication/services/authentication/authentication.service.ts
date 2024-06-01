@@ -97,6 +97,11 @@ export class AuthenticationService {
         return (userPayload);
     }
 
+    clearJwtTokensFromCookies(res: Response) {
+        res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
+    }
+
     /* JWT tokens */
 
     private async generateAccessToken(userPayload: UserPayloadParams): Promise<JwtTokenParams> {
@@ -128,12 +133,8 @@ export class AuthenticationService {
         if (!refreshToken) throw new UnauthorizedException('No refresh token found.'); // TODO.
 
         try {
-            console.log(refreshToken);
             const refreshTokenExp: number = (await this.jwtService.verifyAsync(refreshToken, refreshTokenOptions(this.configService))).exp;
-            console.log("oui");
             const tokenCookieOptions: any = jwtTokenCookieOptions(new Date(refreshTokenExp * 1000));
-
-            console.log("stiti");
 
             const accessToken: JwtTokenParams = await this.generateAccessToken(userPayload);
             await this.storeTokenInCookie(res, accessToken, tokenCookieOptions);
