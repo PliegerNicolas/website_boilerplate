@@ -31,9 +31,4 @@ export class JwtTokenDto {
     @IsString()
     readonly value: string;
 
-    @ApiProperty({ description: 'Token\'s expiration date' })
-    @IsNotEmpty()
-    @IsDate()
-    expiresIn: Date;
-
 }

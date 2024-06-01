@@ -97,7 +97,7 @@ export class AuthenticationController {
         @Res() res: Response,
     ) {
         const userPayload: UserPayloadParams = req.user as UserPayloadParams;
-        await this.authenticationService.refreshAccessToken(userPayload, res);
+        await this.authenticationService.refreshAccessToken(userPayload, req, res);
         res.status(HttpStatus.OK).json(userPayload);
     }
 

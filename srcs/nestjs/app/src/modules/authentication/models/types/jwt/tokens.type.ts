@@ -11,6 +11,5 @@ export type JwtTokenParams = {
 
     readonly name: JwtTokenEnum;
     readonly value: string;
-    expiresIn: Date;
 
 }

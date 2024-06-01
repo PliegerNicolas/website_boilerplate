@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/services/users/users.service';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
 import { ConfigService } from '@nestjs/config';
@@ -10,9 +10,9 @@ import { LocalRegisterParams } from '../../models/types/local/local-register.typ
 import { GoogleRegisterParams } from '../../models/types/google/google-register.type';
 import { JwtTokenParams, JwtTokensParams } from '../../models/types/jwt/tokens.type';
 import { JwtTokenEnum } from '../../models/enums/jwt-tokens.enum';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { accessTokenOptions, refreshTokenOptions } from '../../models/constants/token-options.const';
-import { secureCookieOptions } from '../../models/constants/cookie-options.const';
+import { jwtTokenCookieOptions, secureCookieOptions } from '../../models/constants/cookie-options.const';
 
 @Injectable()
 export class AuthenticationService {
@@ -55,11 +55,12 @@ export class AuthenticationService {
             refreshToken: await this.generateRefreshToken(userPayload),
         };
 
-        if (jwtTokens.accessToken) await this.storeTokenInCookie(res, jwtTokens.accessToken, secureCookieOptions);
-        if (jwtTokens.refreshToken) {
-            await this.storeTokenInCookie(res, jwtTokens.refreshToken, secureCookieOptions);
-            await this.usersService.updateRefreshToken(userPayload.uuid, jwtTokens.refreshToken.value);
-        }
+        const refreshTokenExp: number = this.jwtService.decode(jwtTokens.refreshToken!.value).exp;
+        const tokenCookieOptions: any = jwtTokenCookieOptions(new Date(refreshTokenExp * 1000));
+
+        await this.storeTokenInCookie(res, jwtTokens.accessToken!, tokenCookieOptions);
+        await this.storeTokenInCookie(res, jwtTokens.refreshToken!, tokenCookieOptions);
+        await this.usersService.updateRefreshToken(userPayload.uuid, jwtTokens.refreshToken!.value);
 
         return (userPayload);
     }
@@ -102,15 +103,7 @@ export class AuthenticationService {
         const accessToken: JwtTokenParams = {
             name: JwtTokenEnum.ACCESS,
             value: await this.jwtService.signAsync(userPayload, accessTokenOptions(this.configService)),
-            expiresIn: new Date(),
         };
-
-        try {
-            const tokenPayload: any = await this.jwtService.verifyAsync(accessToken.value, accessTokenOptions(this.configService));
-            accessToken.expiresIn = new Date(tokenPayload.exp * 1000);
-        } catch(error) {
-            throw new UnauthorizedException('Invalid JWT token received. It might have been tinkered with.');
-        }
 
         return (accessToken);
     }
@@ -119,15 +112,7 @@ export class AuthenticationService {
         const refreshToken: JwtTokenParams = {
             name: JwtTokenEnum.REFRESH,
             value: await this.jwtService.signAsync(userPayload, refreshTokenOptions(this.configService)),
-            expiresIn: new Date(),
         };
-
-        try {
-            const tokenPayload: any = await this.jwtService.verifyAsync(refreshToken.value, refreshTokenOptions(this.configService));
-            refreshToken.expiresIn = new Date(tokenPayload.exp * 1000);
-        } catch(error) {
-            throw new UnauthorizedException('Invalid JWT token received. It might have been tinkered with.');
-        }
 
         return (refreshToken);
     }
@@ -135,15 +120,28 @@ export class AuthenticationService {
     async storeTokenInCookie(res: Response, token: JwtTokenParams, options?: any): Promise<void> {
         res.cookie(token.name, token.value, {
             ...options,
-            expires: token.expiresIn,
         });
     }
 
-    async refreshAccessToken(userPayload: UserPayloadParams, res: Response): Promise<UserPayloadParams> {
-        const accessToken: JwtTokenParams = await this.generateAccessToken(userPayload);
+    async refreshAccessToken(userPayload: UserPayloadParams, req: Request, res: Response): Promise<UserPayloadParams> {
+        const refreshToken: string = req.cookies['refresh_token'];
+        if (!refreshToken) throw new UnauthorizedException('No refresh token found.'); // TODO.
 
-        await this.storeTokenInCookie(res, accessToken, secureCookieOptions);
-        return (userPayload);
+        try {
+            console.log(refreshToken);
+            const refreshTokenExp: number = (await this.jwtService.verifyAsync(refreshToken, refreshTokenOptions(this.configService))).exp;
+            console.log("oui");
+            const tokenCookieOptions: any = jwtTokenCookieOptions(new Date(refreshTokenExp * 1000));
+
+            console.log("stiti");
+
+            const accessToken: JwtTokenParams = await this.generateAccessToken(userPayload);
+            await this.storeTokenInCookie(res, accessToken, tokenCookieOptions);
+
+            return (userPayload);
+        } catch(error) {
+            throw new UnauthorizedException(); // TODO.
+        }
     }
     
 }

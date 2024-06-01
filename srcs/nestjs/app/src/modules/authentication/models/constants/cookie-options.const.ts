@@ -4,3 +4,8 @@ export const secureCookieOptions: any = {
     sameSite: 'strict',
     priority: 'high',
 };
+
+export const jwtTokenCookieOptions: any = (exp: Date) => ({
+    ...secureCookieOptions,
+    expires: exp,
+})

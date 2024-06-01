@@ -35,12 +35,12 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
         };
 
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);
-        if (!user) throw new UnauthorizedException('Unauthorized. Invalid jwt access token payload.');
+        if (!user) throw new UnauthorizedException('Invalid jwt access token payload.');
 
         const refreshToken: string = req.cookies['refresh_token'];
 
         if (!await this.hashingService.compare(user.refreshToken, refreshToken)) {
-            throw new UnauthorizedException('Unauthorized. Invalid jwt refresh token.');
+            throw new UnauthorizedException('Invalid jwt refresh token.');
         }
 
         return (userPayload);
