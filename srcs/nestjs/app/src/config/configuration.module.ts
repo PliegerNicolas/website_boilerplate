@@ -31,7 +31,6 @@ import { ConfigOptions } from './config-options/config-options.config';
         ConfigModule,
         RateLimiterModule,
         TypeOrmModule,
-
         CorsConfigService,
         RateLimiterConfigService,
         TypeormConfigService,

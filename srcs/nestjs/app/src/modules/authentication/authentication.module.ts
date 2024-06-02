@@ -10,6 +10,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
+import { RedisModule } from 'src/utils/redis/redis.module';
 
 @Module({
     imports: [
@@ -17,13 +18,13 @@ import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
         UsersModule,
         HashingModule,
         JwtModule,
+        RedisModule,
         PassportModule.registerAsync({
             useFactory: async () => ({
                 defaultStrategy: 'jwt',
                 session: false,
             }),
         }),
-        // Add REDIS to store blacklist.
     ],
     controllers: [AuthenticationController],
     providers: [

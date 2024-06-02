@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/services/users/users.service';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
@@ -13,6 +13,7 @@ import { JwtTokenEnum } from '../../models/enums/jwt-tokens.enum';
 import { Request, Response } from 'express';
 import { accessTokenOptions, refreshTokenOptions } from '../../models/constants/token-options.const';
 import { jwtTokenCookieOptions, secureCookieOptions } from '../../models/constants/cookie-options.const';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthenticationService {
@@ -22,7 +23,10 @@ export class AuthenticationService {
         private readonly usersService: UsersService,
         private readonly hashingService: HashingService,
         private readonly jwtService: JwtService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) {}
+
+    /* Registration */
 
     async registerLocalUser(userDetails: LocalRegisterParams): Promise<UserPayloadParams> {
         userDetails.password = await this.hashingService.hash(userDetails.password);
@@ -49,6 +53,8 @@ export class AuthenticationService {
         return (googleUserPayload);
     }
 
+    /* Login */
+
     async loginUser(userPayload: UserPayloadParams, res: Response): Promise<UserPayloadParams> {
         const jwtTokens: JwtTokensParams = {
             accessToken: await this.generateAccessToken(userPayload),
@@ -65,7 +71,38 @@ export class AuthenticationService {
         return (userPayload);
     }
 
-    /* User validation: used in strategies. */
+    /* Loggout */
+
+    async invalidateAndClearJwtTokensFromCookies(req: Request, res: Response): Promise<void> {
+        const accessToken: string = req.cookies['access_token'];
+        const refreshToken: string = req.cookies['refresh_token'];
+
+        if (!accessToken && !refreshToken) throw new UnauthorizedException('Not authenticated');
+
+        if (accessToken) {
+            try {
+                const decodedAccessToken: any = await this.jwtService.verify(accessToken, accessTokenOptions(this.configService));
+                const ttl: number = decodedAccessToken.exp - Math.floor(Date.now() / 1000);
+                await this.cacheManager.set(`jwt_blacklist:${accessToken}`, true, ttl);
+                //res.clearCookie('access_token');
+            } catch(error) {
+                console.error(error);
+            }
+        }
+
+        if (refreshToken) {
+            try {
+                const decodedRefreshToken: any = await this.jwtService.verify(refreshToken, refreshTokenOptions(this.configService));
+                const ttl: number = decodedRefreshToken.exp - Math.floor(Date.now() / 1000);
+                await this.cacheManager.set(`jwt_blacklist:${refreshToken}`, true, ttl);
+                res.clearCookie('refresh_token');
+            } catch(error) {
+                console.error(error);
+            }
+        }
+    }
+
+    /* User validation: used in passport strategies. */
     
     async validateLocalUser(userDetails: LocalLoginParams): Promise<UserPayloadParams | null> {
         const user: User | null = await this.usersService.findUserByUsername(userDetails.username);
@@ -97,12 +134,17 @@ export class AuthenticationService {
         return (userPayload);
     }
 
-    clearJwtTokensFromCookies(res: Response) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+    /* JWT tokens */
+
+    async storeTokenInCookie(res: Response, token: JwtTokenParams, options?: any): Promise<void> {
+        res.cookie(token.name, token.value, {
+            ...options,
+        });
     }
 
-    /* JWT tokens */
+    async isJwtTokenBlacklisted(token: string): Promise<boolean> {
+        return (!!await this.cacheManager.get(`jwt_blacklist:${token}`));
+    }
 
     private async generateAccessToken(userPayload: UserPayloadParams): Promise<JwtTokenParams> {
         const accessToken: JwtTokenParams = {
@@ -120,12 +162,6 @@ export class AuthenticationService {
         };
 
         return (refreshToken);
-    }
-
-    async storeTokenInCookie(res: Response, token: JwtTokenParams, options?: any): Promise<void> {
-        res.cookie(token.name, token.value, {
-            ...options,
-        });
     }
 
     async refreshAccessToken(userPayload: UserPayloadParams, req: Request, res: Response): Promise<UserPayloadParams> {

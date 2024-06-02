@@ -82,9 +82,10 @@ export class AuthenticationController {
     @ApiOperation({ summary: 'Logout and invalidate JWT access and refresh tokens.' })
     @UseGuards(JwtAuthGuard)
     async logout(
+        @Req() req: Request,
         @Res() res: Response,
     ) {
-        this.authenticationService.clearJwtTokensFromCookies(res);
+        await this.authenticationService.invalidateAndClearJwtTokensFromCookies(req, res);
         res.status(HttpStatus.OK).json("Successfully logged out.");
     }
 

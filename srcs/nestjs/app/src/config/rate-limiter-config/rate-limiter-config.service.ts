@@ -13,7 +13,7 @@ export class RateLimiterConfigService {
         const redisOptions: RedisOptions = {
             host: this.configService.getOrThrow<string>('redis.host'),
             port: this.configService.getOrThrow<number>('redis.port'),
-            username: this.configService.getOrThrow<string>('redis.user'),
+            username: this.configService.getOrThrow<string>('redis.username'),
             password: this.configService.getOrThrow<string>('redis.password'),
         };
 

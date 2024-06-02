@@ -39,14 +39,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
             password: undefined,
         }
 
-        if (!googleUserDetails.email) throw new UnauthorizedException('Unauthorized. Invalid or unverified email address received through google oauth2 protocol.');
+        if (!googleUserDetails.email) throw new UnauthorizedException('Invalid or unverified email address received through google oauth2 protocol');
     
         const userPayload: UserPayloadParams | null = (
             await this.authenticationService.validateGoogleUser(googleUserDetails)
             || await this.authenticationService.registerGoogleUser(googleUserDetails)
         );
 
-        if (!userPayload) throw new UnauthorizedException('Unauthorized. Failed to verify/register account through google oauth2 protocol.');
+        if (!userPayload) throw new UnauthorizedException('Failed to verify/register account through google oauth2 protocol');
 
         return (userPayload);
     }

@@ -12,7 +12,7 @@ export class RedisConfigEnvValidation {
 
     @IsNotEmpty()
     @IsString()
-    user: string;
+    username: string;
 
     @IsNotEmpty()
     @IsString()
