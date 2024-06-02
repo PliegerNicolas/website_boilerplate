@@ -84,7 +84,7 @@ export class AuthenticationService {
                 const decodedAccessToken: any = await this.jwtService.verify(accessToken, accessTokenOptions(this.configService));
                 const ttl: number = decodedAccessToken.exp - Math.floor(Date.now() / 1000);
                 await this.cacheManager.set(`jwt_blacklist:${accessToken}`, true, ttl);
-                //res.clearCookie('access_token');
+                res.clearCookie('access_token');
             } catch(error) {
                 console.error(error);
             }
