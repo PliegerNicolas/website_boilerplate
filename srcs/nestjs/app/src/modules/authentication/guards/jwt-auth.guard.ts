@@ -30,11 +30,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     handleRequest<TUser = any>(err: any, user: any, info: any, context: ExecutionContext, status?: any): TUser {
         const req: Request = context.switchToHttp().getRequest();
+
         const accessToken: string = req.cookies['access_token'];
+        const refreshToken: string = req.cookies['refresh_token'];
 
         if (err || !user) {
 
-            if (accessToken) {
+            if (accessToken && refreshToken) {
                 try {
                     const payload: any = this.jwtService.verify(accessToken, accessTokenOptions(this.configService));
                 } catch(error) {
