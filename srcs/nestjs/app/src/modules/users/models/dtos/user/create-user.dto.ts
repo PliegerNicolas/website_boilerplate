@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { RegistrationMethodDto } from "../registration-method/registration-method.dto";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreateUserDto {
@@ -15,12 +15,9 @@ export class CreateUserDto {
     @IsString()
     readonly username: string;
 
-    @ApiProperty({ description: 'Registration method(s).' })
+    @ApiProperty({ description: 'Registration method' })
     @IsNotEmpty()
-    @IsArray()
-    @ArrayMinSize(1)
-    @ArrayMaxSize(1)
-    @ValidateNested({ each: true })
+    @ValidateNested()
     @Type(() => RegistrationMethodDto)
     readonly registrationMethod: RegistrationMethodDto;
 

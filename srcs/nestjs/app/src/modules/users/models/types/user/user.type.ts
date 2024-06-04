@@ -3,17 +3,17 @@ import { RegistrationMethodParams } from "../registration-method/registration-me
 export type CreateUserParams = {
     readonly email: string;
     readonly username: string;
-    readonly registrationMethod: RegistrationMethodParams,
+    readonly registrationMethod: RegistrationMethodParams;
 }
 
 export type ReplaceUserParams = {
     readonly email: string;
     readonly username: string;
-    readonly registrationMethod: RegistrationMethodParams,
+    password: string;
 }
 
 export type UpdateUserParams = {
     readonly email?: string;
     readonly username?: string;
-    readonly registrationMethod?: RegistrationMethodParams,
+    password?: string;
 }

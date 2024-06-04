@@ -1,7 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
-import { RegistrationMethodDto } from "../registration-method/registration-method.dto";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class ReplaceUserDto {
 
@@ -15,13 +13,10 @@ export class ReplaceUserDto {
     @IsString()
     readonly username: string;
 
-    @ApiProperty({ description: 'Registration method(s).' })
+    @ApiProperty({ description: 'Password. Giving a password enforces local authentication strategy.' })
+    @IsOptional()
     @IsNotEmpty()
-    @IsArray()
-    @ArrayMinSize(1)
-    @ArrayMaxSize(1)
-    @ValidateNested({ each: true })
-    @Type(() => RegistrationMethodDto)
-    readonly registrationMethod: RegistrationMethodDto;
+    @IsString()
+    password: string;
 
 }

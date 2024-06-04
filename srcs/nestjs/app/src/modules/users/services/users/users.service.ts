@@ -5,6 +5,9 @@ import { Equal, ILike, Repository } from 'typeorm';
 import { CreateUserParams, ReplaceUserParams, UpdateUserParams } from '../../models/types/user/user.type';
 import { GetUsersQueryParams } from '../../models/types/query-params/get-users.type';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
+import { RegistrationMethodParams } from '../../models/types/registration-method/registration-method.type';
+import { RegistrationProvider } from '../../models/enums/registration-provider.enum';
+import { RegistrationMethod } from '../../entities/registration-method.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +15,9 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        @InjectRepository(RegistrationMethod)
+        private readonly registrationMethodRepository: Repository<RegistrationMethod>,
+
         private readonly hashingService: HashingService,
     ) {}
 
@@ -42,20 +48,36 @@ export class UsersService {
         return(await this.userRepository.save(user));
     }
 
-    async replaceUser(targetusername: string, userDetails: ReplaceUserParams): Promise<User> {
-        const user: User | null = await this.findUserByUsername(targetusername);
+    async replaceUser(targetUsername: string, userDetails: ReplaceUserParams): Promise<User> {
+        const user: User | null = await this.findUserByUsername(targetUsername);
 
-        if (!user) throw new NotFoundException(`User ${userDetails.username} not found`);
+        if (!user) throw new NotFoundException(`User ${userDetails.username} not found`); 
 
-        return (user);
+        if (userDetails.password) {
+            userDetails.password = await this.hashingService.hash(userDetails.password);
+            user.registrationMethod.provider = RegistrationProvider.LOCAL;
+            user.registrationMethod.identifier = userDetails.password;
+        }
+
+        this.userRepository.merge(user, userDetails);
+        return (await this.userRepository.save(user));
     }
 
-    async updateUser(targetusername: string, userDetails: UpdateUserParams): Promise<User> {
-        const user: User | null = await this.findUserByUsername(targetusername);
+    async updateUser(targetUsername: string, userDetails: UpdateUserParams): Promise<User> {
+        const user: User | null = await this.findUserByUsername(targetUsername);
 
         if (!user) throw new NotFoundException(`User ${userDetails.username} not found`);
 
-        return (user);
+        if (userDetails.password) {
+            userDetails.password = await this.hashingService.hash(userDetails.password);
+            user.registrationMethod.provider = RegistrationProvider.LOCAL;
+            user.registrationMethod.identifier = userDetails.password;
+        }
+
+        console.log(user);
+        this.userRepository.merge(user, userDetails);
+        console.log(user);
+        return (await this.userRepository.save(user));
     }
 
     async deleteUser(targetusername: string): Promise<string> {

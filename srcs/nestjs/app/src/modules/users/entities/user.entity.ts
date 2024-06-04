@@ -18,6 +18,7 @@ export class User {
     @Column({ type: 'enum', enum: ServerRole, default: ServerRole.UNVERIFIED })
     serverRole: ServerRole;
 
+    @Exclude()
     @OneToOne(() => RegistrationMethod, (registrationMethod) => registrationMethod.user, { cascade: true })
     @JoinColumn()
     registrationMethod: RegistrationMethod;

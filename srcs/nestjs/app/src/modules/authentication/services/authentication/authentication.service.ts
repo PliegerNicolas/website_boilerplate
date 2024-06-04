@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/services/users/users.service';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
@@ -196,7 +196,7 @@ export class AuthenticationService {
 
     async refreshAccessToken(userPayload: UserPayloadParams, req: Request, res: Response): Promise<UserPayloadParams> {
         const refreshToken: string = req.cookies['refresh_token'];
-        if (!refreshToken) throw new UnauthorizedException('No refresh token found.'); // TODO.
+        if (!refreshToken) throw new UnauthorizedException('No refresh token available.'); // TODO.
 
         try {
             const refreshTokenExp: number = (await this.jwtService.verifyAsync(refreshToken, refreshTokenOptions(this.configService))).exp;
