@@ -35,8 +35,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         const googleUserDetails: GoogleRegisterParams = {
             email: profile.emails.find((email: any) => email.verified)?.value,
             username: profile.displayName,
-            registrationMethod: RegistrationMethodEnum.GOOGLE_OAUTH2,
-            password: undefined,
+            googleId: profile.id,
         }
 
         if (!googleUserDetails.email) throw new UnauthorizedException('Invalid or unverified email address received through google oauth2 protocol');

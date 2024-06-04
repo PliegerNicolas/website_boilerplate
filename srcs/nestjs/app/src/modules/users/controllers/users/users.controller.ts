@@ -2,15 +2,13 @@ import { Body, Controller, Delete, Get, Param, Patch, Put, Query, Req, UseGuards
 import { UsersService } from '../../services/users/users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '../../entities/user.entity';
-import { ReplaceUserDto } from '../../models/dtos/replace-user.dto';
-import { UpdateUserDto } from '../../models/dtos/update-user.dto';
 import { GetUsersQueryDto } from '../../models/dtos/query-params/get-users.dto';
-import { Public } from 'src/modules/authentication/decorators/public.decorator';
 import { ServerRoles } from 'src/modules/authentication/decorators/roles.decorator';
 import { ServerRole } from '../../models/enums/role.enum';
 import { JwtAuthGuard } from 'src/modules/authentication/guards/jwt-auth.guard';
 import { ServerRolesGuard } from 'src/modules/authentication/guards/server-roles.guard';
-import { UserPayloadParams } from 'src/modules/authentication/models/types/jwt/payloads.type';
+import { ReplaceUserDto } from '../../models/dtos/user/replace-user.dto';
+import { UpdateUserDto } from '../../models/dtos/user/update-user.dto';
 
 @ApiTags('users')
 @Controller('users')

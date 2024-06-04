@@ -5,8 +5,8 @@ import { ServerRolesGuard } from 'src/modules/authentication/guards/server-roles
 import { UsersService } from '../../services/users/users.service';
 import { User } from '../../entities/user.entity';
 import { UserPayloadParams } from 'src/modules/authentication/models/types/jwt/payloads.type';
-import { ReplaceUserDto } from '../../models/dtos/replace-user.dto';
-import { UpdateUserDto } from '../../models/dtos/update-user.dto';
+import { ReplaceUserDto } from '../../models/dtos/user/replace-user.dto';
+import { UpdateUserDto } from '../../models/dtos/user/update-user.dto';
 
 @ApiTags('me')
 @Controller('me')

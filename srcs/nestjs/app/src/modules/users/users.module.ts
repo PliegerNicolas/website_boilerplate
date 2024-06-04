@@ -6,10 +6,11 @@ import { User } from './entities/user.entity';
 import { HashingModule } from 'src/utils/hashing/hashing.module';
 import { JwtService } from '@nestjs/jwt';
 import { MeController } from './controllers/me/me.controller';
+import { RegistrationMethod } from './entities/registration-method.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User, RegistrationMethod]),
         HashingModule,
     ],
     controllers: [UsersController, MeController],

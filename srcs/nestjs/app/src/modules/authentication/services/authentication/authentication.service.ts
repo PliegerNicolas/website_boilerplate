@@ -4,9 +4,8 @@ import { UsersService } from 'src/modules/users/services/users/users.service';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
 import { ConfigService } from '@nestjs/config';
 import { UserPayloadParams } from '../../models/types/jwt/payloads.type';
-import { LocalLoginParams } from '../../models/types/local/local-login.type';
+import { LocalLoginParams, LocalRegisterAndMethodParams, LocalRegisterParams } from '../../models/types/local/local.type';
 import { User } from 'src/modules/users/entities/user.entity';
-import { LocalRegisterParams } from '../../models/types/local/local-register.type';
 import { GoogleRegisterParams } from '../../models/types/google/google-register.type';
 import { JwtTokenParams, JwtTokensParams } from '../../models/types/jwt/tokens.type';
 import { JwtTokenEnum } from '../../models/enums/jwt-tokens.enum';
@@ -14,6 +13,8 @@ import { Request, Response } from 'express';
 import { accessTokenOptions, refreshTokenOptions } from '../../models/constants/token-options.const';
 import { jwtTokenCookieOptions } from '../../models/constants/cookie-options.const';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { RegistrationProvider } from 'src/modules/users/models/enums/registration-provider.enum';
+import { RegistrationMethod } from 'src/modules/users/entities/registration-method.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -30,7 +31,17 @@ export class AuthenticationService {
 
     async registerLocalUser(userDetails: LocalRegisterParams): Promise<UserPayloadParams> {
         userDetails.password = await this.hashingService.hash(userDetails.password);
-        const user: User = await this.usersService.createUser(userDetails);
+
+        const userDetailsAndMethod: LocalRegisterAndMethodParams = {
+            email: userDetails.email,
+            username: userDetails.username,
+            registrationMethod: {
+                provider: RegistrationProvider.LOCAL,
+                identifier: userDetails.password,
+            },
+        };
+
+        const user: User = await this.usersService.createUser(userDetailsAndMethod);
 
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
@@ -42,7 +53,18 @@ export class AuthenticationService {
     }
 
     async registerGoogleUser(googleUserDetails: GoogleRegisterParams): Promise<UserPayloadParams> {
-        const user: User = await this.usersService.createUser(googleUserDetails);
+        googleUserDetails.googleId = await this.hashingService.hash(googleUserDetails.googleId);
+
+        const googleUserDetailsAndMethod: LocalRegisterAndMethodParams = {
+            email: googleUserDetails.email,
+            username: googleUserDetails.username,
+            registrationMethod: {
+                provider: RegistrationProvider.GOOGLE_OAUTH2,
+                identifier: googleUserDetails.googleId,
+            },
+        };
+        
+        const user: User = await this.usersService.createUser(googleUserDetailsAndMethod);
 
         const googleUserPayload: UserPayloadParams = {
             uuid: user.uuid,
@@ -107,7 +129,10 @@ export class AuthenticationService {
     async validateLocalUser(userDetails: LocalLoginParams): Promise<UserPayloadParams | null> {
         const user: User | null = await this.usersService.findUserByUsername(userDetails.username);
 
-        if (!user || !await this.hashingService.compare(user.password, userDetails.password)) {
+        if (!user) return (null);
+
+        if (user.registrationMethod.provider !== RegistrationProvider.LOCAL
+            || !await this.hashingService.compare(user.registrationMethod.identifier, userDetails.password)) {
             return (null);
         }
 
@@ -124,6 +149,11 @@ export class AuthenticationService {
         const user: User | null = await this.usersService.findUserByEmail(googleUserDetails.email);
 
         if (!user) return (null);
+
+        if (user.registrationMethod.provider !== RegistrationProvider.GOOGLE_OAUTH2
+            || !await this.hashingService.compare(user.registrationMethod.identifier, googleUserDetails.googleId)) {
+            return (null);
+        }
 
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,

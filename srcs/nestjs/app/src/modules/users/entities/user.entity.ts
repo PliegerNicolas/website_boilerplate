@@ -1,8 +1,7 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, TableInheritance, UpdateDateColumn } from "typeorm";
-import { RegistrationMethodEnum } from "../models/enums/registration-method.enum";
-import { IsEnum } from "class-validator";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import { ServerRole } from "../models/enums/role.enum";
+import { RegistrationMethod } from "./registration-method.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -16,17 +15,12 @@ export class User {
     @Column({ unique: true })
     username: string;
 
-    @Column({ type: 'enum', enum: ServerRole, default: ServerRole.USER })
+    @Column({ type: 'enum', enum: ServerRole, default: ServerRole.UNVERIFIED })
     serverRole: ServerRole;
 
-    @Exclude()
-    @Column()
-    @IsEnum({ type: 'enum', enum: RegistrationMethodEnum })
-    registrationMethod: RegistrationMethodEnum;
-
-    @Exclude()
-    @Column({ nullable: true })
-    password: string;
+    @OneToOne(() => RegistrationMethod, (registrationMethod) => registrationMethod.user, { cascade: true })
+    @JoinColumn()
+    registrationMethod: RegistrationMethod;
     
     @Exclude()
     @Column({ nullable: true, default: null })
@@ -41,18 +35,6 @@ export class User {
     /* Relationships */
 
     /* Life cycle */
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    private verifications(): void {
-        if (this.shouldPasswordExist() !== !!this.password) {
-            throw new Error('Password is required for local registration method'); // Set exception instead maybe ?
-        }
-    }
-
-    private shouldPasswordExist(): boolean {
-        return (this.registrationMethod === RegistrationMethodEnum.LOCAL);
-    }
 
     /* Helper methods */
 

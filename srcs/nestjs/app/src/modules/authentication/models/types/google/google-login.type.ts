@@ -1,5 +1,1 @@
-export type GoogleLoginParams = {
-
-    readonly email: string;
-
-}
+export type GoogleLoginParams = {}

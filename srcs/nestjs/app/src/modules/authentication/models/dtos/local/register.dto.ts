@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { RegistrationMethodEnum } from "src/modules/users/models/enums/registration-method.enum";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class LocalRegisterDto {
 
@@ -13,11 +12,6 @@ export class LocalRegisterDto {
     @IsNotEmpty()
     @IsString()
     readonly username: string;
-
-    // Automatically filled in.
-    @IsNotEmpty()
-    @IsEnum(RegistrationMethodEnum)
-    readonly registrationMethod: RegistrationMethodEnum = RegistrationMethodEnum.LOCAL;
 
     @ApiProperty({ description: 'Password' })
     @IsNotEmpty()

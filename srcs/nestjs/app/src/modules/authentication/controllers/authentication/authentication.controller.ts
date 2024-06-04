@@ -8,7 +8,7 @@ import { UserPayloadParams } from '../../models/types/jwt/payloads.type';
 import { Request, Response } from 'express';
 import { GoogleOAuthGuard } from '../../guards/google-auth.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import JwtRefreshGuard from '../../guards/jwt-refresh.guard';
+import { JwtRefreshGuard } from '../../guards/jwt-refresh.guard';
 
 @ApiTags('auth')
 @Controller('auth')

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
 import { Equal, ILike, Repository } from 'typeorm';
-import { CreateUserParams, ReplaceUserParams, UpdateUserParams } from '../../models/types/user.type';
+import { CreateUserParams, ReplaceUserParams, UpdateUserParams } from '../../models/types/user/user.type';
 import { GetUsersQueryParams } from '../../models/types/query-params/get-users.type';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
 
@@ -12,7 +12,6 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-
         private readonly hashingService: HashingService,
     ) {}
 
@@ -74,7 +73,8 @@ export class UsersService {
         const user: User | null = await this.userRepository.findOne({
             where: {
                 uuid: Equal(uuid),
-            }
+            },
+            relations: ['registrationMethod'],
         });
         
         return (user);
@@ -84,7 +84,8 @@ export class UsersService {
         const user: User | null = await this.userRepository.findOne({
             where: {
                 email: Equal(email),
-            }
+            },
+            relations: ['registrationMethod'],
         });
         
         return (user);
@@ -94,7 +95,8 @@ export class UsersService {
         const user: User | null = await this.userRepository.findOne({
             where: {
                 username: Equal(username),
-            }
+            },
+            relations: ['registrationMethod'],
         });
         
         return (user);
