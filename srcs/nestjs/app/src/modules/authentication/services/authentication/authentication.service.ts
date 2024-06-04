@@ -1,5 +1,5 @@
-import { HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/services/users/users.service';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
 import { ConfigService } from '@nestjs/config';
@@ -12,7 +12,7 @@ import { JwtTokenParams, JwtTokensParams } from '../../models/types/jwt/tokens.t
 import { JwtTokenEnum } from '../../models/enums/jwt-tokens.enum';
 import { Request, Response } from 'express';
 import { accessTokenOptions, refreshTokenOptions } from '../../models/constants/token-options.const';
-import { jwtTokenCookieOptions, secureCookieOptions } from '../../models/constants/cookie-options.const';
+import { jwtTokenCookieOptions } from '../../models/constants/cookie-options.const';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class AuthenticationService {
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
-            role: user.role,
+            serverRole: user.serverRole,
         };
 
         return (userPayload);
@@ -47,7 +47,7 @@ export class AuthenticationService {
         const googleUserPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
-            role: user.role,
+            serverRole: user.serverRole,
         }
 
         return (googleUserPayload);
@@ -114,7 +114,7 @@ export class AuthenticationService {
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
-            role: user.role,
+            serverRole: user.serverRole,
         };
 
         return (userPayload);
@@ -128,7 +128,7 @@ export class AuthenticationService {
         const userPayload: UserPayloadParams = {
             uuid: user.uuid,
             username: user.username,
-            role: user.role,
+            serverRole: user.serverRole,
         };
 
         return (userPayload);

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator";
-import { RoleEnum } from "src/modules/users/models/enums/role.enum";
+import { ServerRole } from "src/modules/users/models/enums/role.enum";
 
 export class UserPayloadDto {
 
@@ -16,7 +16,7 @@ export class UserPayloadDto {
 
     @ApiProperty({ description: 'Role.' })
     @IsNotEmpty()
-    @IsEnum(RoleEnum)
-    readonly role: RoleEnum;
+    @IsEnum(ServerRole)
+    readonly serverRole: ServerRole;
 
 }

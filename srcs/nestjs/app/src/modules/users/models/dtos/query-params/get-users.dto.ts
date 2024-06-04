@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { RoleEnum } from "../../enums/role.enum";
+import { ServerRole } from "../../enums/role.enum";
 
 export class GetUsersQueryDto {
  
@@ -11,7 +11,7 @@ export class GetUsersQueryDto {
 
     @ApiProperty({ description: 'Prefix of role to filter with', required: false })
     @IsOptional()
-    @IsEnum(RoleEnum)
-    readonly role?: RoleEnum;
+    @IsEnum(ServerRole)
+    readonly serverRole?: ServerRole;
     
 }

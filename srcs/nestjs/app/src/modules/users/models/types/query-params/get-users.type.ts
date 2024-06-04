@@ -1,8 +1,8 @@
-import { RoleEnum } from "../../enums/role.enum";
+import { ServerRole } from "../../enums/role.enum";
 
 export type GetUsersQueryParams = {
  
     readonly username?: string;
-    readonly role?: RoleEnum;
+    readonly serverRole?: ServerRole;
     
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Put, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Put, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
 import { UsersService } from '../../services/users/users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '../../entities/user.entity';
@@ -6,23 +6,26 @@ import { ReplaceUserDto } from '../../models/dtos/replace-user.dto';
 import { UpdateUserDto } from '../../models/dtos/update-user.dto';
 import { GetUsersQueryDto } from '../../models/dtos/query-params/get-users.dto';
 import { Public } from 'src/modules/authentication/decorators/public.decorator';
-import { Roles } from 'src/modules/authentication/decorators/roles.decorator';
-import { RoleEnum } from '../../models/enums/role.enum';
+import { ServerRoles } from 'src/modules/authentication/decorators/roles.decorator';
+import { ServerRole } from '../../models/enums/role.enum';
 import { JwtAuthGuard } from 'src/modules/authentication/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/modules/authentication/guards/roles.guard';
+import { ServerRolesGuard } from 'src/modules/authentication/guards/server-roles.guard';
+import { UserPayloadParams } from 'src/modules/authentication/models/types/jwt/payloads.type';
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, ServerRolesGuard)
 export class UsersController {
 
     constructor(
         private readonly userService: UsersService,
     ) {}
 
+    /* General paths */
+
     @Get()
     @ApiOperation({ summary: 'Retrieves a list of all users.' })
-    @Public()
+    @ServerRoles(ServerRole.USER)
     async getUsers(
         @Query(new ValidationPipe({ transform: true, whitelist: true })) GetUsersQueryDto: GetUsersQueryDto,
     ): Promise <User[]> {
@@ -31,7 +34,7 @@ export class UsersController {
 
     @Get(':username')
     @ApiOperation({ summary: 'Retrieve a user by username.' })
-    @Roles(RoleEnum.USER) // Should add a ME. TODO.
+    @ServerRoles(ServerRole.USER)
     async getUser(
         @Param('username') username: string,
     ): Promise <User> {
@@ -40,7 +43,7 @@ export class UsersController {
 
     @Put(':username')
     @ApiOperation({ summary: 'Replace a user by username.' })
-    @Roles(RoleEnum.USER) // Should add a ME.
+    @ServerRoles(ServerRole.ADMIN)
     async replaceUser(
         @Param('username') username: string,
         @Body() userDetails: ReplaceUserDto,
@@ -50,7 +53,7 @@ export class UsersController {
 
     @Patch(':username')
     @ApiOperation({ summary: 'Partially update a user by username.' })
-    @Roles(RoleEnum.USER) // Should add a ME.
+    @ServerRoles(ServerRole.ADMIN)
     async updateUser(
         @Param('username') username: string,
         @Body() userDetails: UpdateUserDto,
@@ -60,7 +63,7 @@ export class UsersController {
 
     @Delete(':username')
     @ApiOperation({ summary: 'Delete a user by username.' })
-    @Roles(RoleEnum.ADMIN) // Should add a ME.
+    @ServerRoles(ServerRole.ADMIN)
     async deleteUser(
         @Param('username') username: string,
     ): Promise<string> {

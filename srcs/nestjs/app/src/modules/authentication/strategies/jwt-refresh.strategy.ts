@@ -37,7 +37,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
         const userPayload: UserPayloadParams = {
             uuid: payload.uuid,
             username: payload.username,
-            role: payload.role,
+            serverRole: payload.serverRole,
         };
 
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);

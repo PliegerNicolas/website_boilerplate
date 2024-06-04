@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
-import { Equal, ILike, Like, Repository } from 'typeorm';
+import { Equal, ILike, Repository } from 'typeorm';
 import { CreateUserParams, ReplaceUserParams, UpdateUserParams } from '../../models/types/user.type';
 import { GetUsersQueryParams } from '../../models/types/query-params/get-users.type';
 import { HashingService } from 'src/utils/hashing/services/hashing/hashing.service';
@@ -22,7 +22,7 @@ export class UsersService {
         const users: User[] = await this.userRepository.find({
             where: {
                 username: queryParams.username ? ILike(`${queryParams.username}%`) : undefined,
-                role: queryParams.role ? Equal(queryParams.role) : undefined,
+                serverRole: queryParams.serverRole ? Equal(queryParams.serverRole) : undefined,
             },
         });
 

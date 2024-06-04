@@ -35,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         const userPayload: UserPayloadParams = {
             uuid: payload.uuid,
             username: payload.username,
-            role: payload.role,
+            serverRole: payload.serverRole,
         };
 
         const user: User | null = await this.usersService.findUserByUuid(userPayload.uuid);
