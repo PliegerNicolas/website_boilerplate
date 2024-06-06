@@ -15,8 +15,8 @@ DC			:=			docker compose
 # **************************************************************************** #
 
 define build_volume_folders
-	mkdir -p ${HOME}/data/postgresql/nestjs
-	mkdir -p ${HOME}/data/redis
+	mkdir -p ./data/postgresql/nestjs
+	mkdir -p ./data/redis
 endef
 
 # **************************************************************************** #

@@ -127,11 +127,11 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${HOME}/data/postgresql/nestjs
+      device: ./data/postgresql/nestjs
       o: bind
   redis_data:
     driver: local
     driver_opts:
       type: none
-      device: ${HOME}/data/redis
+      device: ./data/redis
       o: bind
