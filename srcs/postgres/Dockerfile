@@ -1,5 +1,5 @@
-# Latest stable version of alpine linux image as of 15/04/2024
-FROM alpine:3.19.1
+# Latest stable version of alpine linux image as of 16/06/2024
+FROM alpine:3.20.0
 
 # Set docker-compose build arguments
 ARG WHITELISTED_CONTAINER_NAME \
