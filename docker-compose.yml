@@ -82,7 +82,7 @@ services:
     build:
       context: ./srcs/postgres
       args:
-        - WHITELISTED_CONTAINER_NAME='nestjs'
+        - WL_ADDRS=nestjs.network
         - PORT=${DB_NESTJS_PORT}
         - POSTGRES_DB=${POSTGRES_NESTJS_DB}
         - POSTGRES_USER=${POSTGRES_NESTJS_USER}

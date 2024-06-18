@@ -31,5 +31,3 @@ fi
 
 echo "[i] Generating ${OUTPUT_FILE} by substituting environment variables from ${INPUT_FILE}";
 eval "$JOINED_SEDS $INPUT_FILE > $OUTPUT_FILE";
-
-exec "$@"

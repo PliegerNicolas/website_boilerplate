@@ -2,7 +2,7 @@
 FROM alpine:3.20.0
 
 # Set docker-compose build arguments
-ARG WHITELISTED_CONTAINER_NAME \
+ARG	WL_ADDRS \
 	PORT \
 	POSTGRES_DB \
 	POSTGRES_USER \
@@ -11,8 +11,7 @@ ARG WHITELISTED_CONTAINER_NAME \
 # Set local build arguments
 ARG	PGDATA='/var/lib/postgresql/data' \
 	PGRUN='/run/postgresql' \
-	PGSCRIPTS='/var/lib/postgresql/scripts' \
-	WHITELISTED_CONTAINER_NAME=${WHITELISTED_CONTAINER_NAME}
+	PGSCRIPTS='/var/lib/postgresql/scripts'
 
 # Add PGDATA to env variables independently of docker-compose
 ENV PGDATA=${PGDATA}
@@ -33,7 +32,7 @@ RUN mkdir -p ${PGDATA} ${PGRUN} ${PGSCRIPTS} && \
 USER postgres
 
 # Initializing PostgreSQL database cluster if needed
-RUN if [ -z "$(ls -A $PGDATA)" ]; then \
+RUN	if [ -z "$(ls -A $PGDATA)" ]; then \
 		initdb -D $PGDATA -E UTF8 --locale=en_US.utf8 || exit 1; \
 	fi
 
@@ -42,12 +41,12 @@ COPY ./conf/pg_hba.conf.template ./conf/postgresql.conf.template ${PGDATA}/
 COPY ./scripts/generate_postgresql.conf.sh ./scripts/generate_pg_hba.conf.sh ${PGSCRIPTS}/
 
 # Execute script to generate postgresql.conf and pg_hba.conf files
-RUN sh ${PGSCRIPTS}/generate_postgresql.conf.sh && \
-	sh ${PGSCRIPTS}/generate_pg_hba.conf.sh && \
+RUN	sh ${PGSCRIPTS}/generate_postgresql.conf.sh && \
+	sh ${PGSCRIPTS}/generate_pg_hba.conf.sh ${WL_ADDRS} && \
 	rm -rf ${PGSCRIPTS}
 
 # Setup $POSTGRES_DB
-RUN pg_ctl -w start && \
+RUN	pg_ctl -w start && \
 		if [ -z "$(psql -p $PORT -XtAc "SELECT 1 FROM pg_user WHERE usename!='postgres'" )" ]; then \
 			psql -p $PORT -c "CREATE USER $POSTGRES_USER WITH ENCRYPTED PASSWORD '$POSTGRES_PASSWORD';"; \
 			if [ -z "$( psql -p $PORT -XtAc "SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" )" ]; then \
@@ -55,7 +54,7 @@ RUN pg_ctl -w start && \
 				psql -p $PORT -d $POSTGRES_DB -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"; \
 			fi; \
 		fi && \
-    pg_ctl -w stop -m fast
+	pg_ctl -w stop -m fast
 
 # Expose given port
 EXPOSE ${PORT}

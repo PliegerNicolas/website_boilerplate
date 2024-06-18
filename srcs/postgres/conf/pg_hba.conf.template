@@ -126,8 +126,6 @@ local   replication     all                                                     
 host    replication     all             127.0.0.1/32                            md5
 host    replication     all             ::1/128                                 md5
 
-# Allow connexions from containers from Docker Network
-host    all             all             ${WHITELISTED_CONTAINER_NAME}.network   md5
+### Elements will be appended under here. Take those into consideration. Specifically:
+# host    all             all             all                                     reject
 
-# Reject all other connexions
-host    all             all             all                                     reject

@@ -3,33 +3,27 @@
 INPUT_FILE="/var/lib/postgresql/data/pg_hba.conf.template";
 OUTPUT_FILE="/var/lib/postgresql/data/pg_hba.conf";
 
-REQUIRED_ENV_VARS="WHITELISTED_CONTAINER_NAME";
-NOT_SET_ENV_VARS="";
-
-echo "[i] Generating environment variable substitution command (with sed):"
-JOINED_SEDS="";
-for env_var_name in $REQUIRED_ENV_VARS; do
-    env_var_value=$(printenv $env_var_name)
-
-    if [ -z "$env_var_value" ]; then
-	    NOT_SET_ENV_VARS="${NOT_SET_ENV_VARS} ${env_var_name}";
-    else
-        SED="-e 's/\${${env_var_name}}/${env_var_value}/g'"
-        if [ -z "$JOINED_SEDS" ]; then
-            JOINED_SEDS="sed $SED";
-        else
-            JOINED_SEDS="$JOINED_SEDS $SED";
-        fi
-    fi
-done
-echo "[i] > $JOINED_SEDS";
-
-if [ -n "$NOT_SET_ENV_VARS" ]; then
-    echo "[w] Missing environment variables: $NOT_SET_ENV_VARS"
-    exit 1;
+if [ $# -ne 1 ]; then
+	echo "[!] Strictly one argument is expected." >&2
+	echo "[i] Usage: sh $0 'addr1 addr2 addr3 addr4' ...>" >&1
+	exit 1
 fi
 
-echo "[i] Generating ${OUTPUT_FILE} by substituting environment variables from ${INPUT_FILE}";
-eval "$JOINED_SEDS $INPUT_FILE > $OUTPUT_FILE";
+WL_ADDRS=$1
 
-exec "$@"
+echo $WL_ADDRS
+
+echo "[i] Copy ${INPUT_FILE} as ${OUTPUT_FILE}."
+cp ${INPUT_FILE} ${OUTPUT_FILE}
+
+echo "[i] Append to ${OUTPUT_FILE} additionnal configuration."
+
+echo "# Allow connexions from containers from Docker Network" >> ${OUTPUT_FILE}
+for WL_ADDR in ${WL_ADDRS}; do
+	echo "host    all             all		${WL_ADDR}	md5" >> ${OUTPUT_FILE}
+done
+echo ""
+echo "# Reject all other connexions" >> ${OUTPUT_FILE}
+echo "host    all             all             all                     reject" >> ${OUTPUT_FILE}
+
+echo "[i] Generated ${OUTPUT_FILE} successfully.";
