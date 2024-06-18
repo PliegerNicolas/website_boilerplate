@@ -1,0 +1,1 @@
+export const HTTP_STATUS_TOKEN_EXPIRED = 498

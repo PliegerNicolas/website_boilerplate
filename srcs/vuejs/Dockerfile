@@ -1,10 +1,11 @@
-# Latest stable version of alpine linux image as of 15/04/2024
-FROM alpine:3.19.1
+# Latest stable version of alpine linux image as of 16/06/2024
+FROM alpine:3.20.0
 
-ARG APP_DIR='/app' \
-    PORT
+# Set docker-compose build arguments
+ARG PORT
 
-ENV PORT=${PORT}
+# Set local build arguments
+ARG APP_DIR='/app'
 
 # Install dependencies
 RUN apk update && \
@@ -36,7 +37,7 @@ RUN addgroup -S vuejs && \
 # Set USER
 USER vuejs
 
-# Expose Vue default port
+# Expose port
 EXPOSE ${PORT}
 
 CMD ["pnpm", "run", "dev"]
