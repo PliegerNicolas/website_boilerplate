@@ -32,9 +32,13 @@ up:
 down:
 	${DC} down -v --remove-orphans
 
+clean: down
+
+fclean: down purge
+
 re: down up
 
-purge: down
+purge:
 	docker system prune -fa
 
-.PHONY: up down re purge
+.PHONY: up down clean fclean re purge
